@@ -1,6 +1,6 @@
 """
 Ответственность:
-Управление токенами через централизованную БД с учетом ИНН компаний.
+Управление бизнесами, токенами и балансами пользователей.
 Поддерживает обновление существующих записей.
 """
 
@@ -30,6 +30,16 @@ class DBManager:
                     FOREIGN KEY (business_inn) REFERENCES businesses(inn)
                 )
             """)
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS user_tokens (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    email TEXT NOT NULL,
+                    business_inn TEXT NOT NULL,
+                    tokens REAL DEFAULT 0,
+                    UNIQUE(email, business_inn),
+                    FOREIGN KEY(business_inn) REFERENCES businesses(inn)
+                )
+            """)
             print("[DEBUG] Таблицы проверены/созданы.")
 
     def register_or_update_business(self, inn: str, name: str):
@@ -38,16 +48,14 @@ class DBManager:
             cursor = self.conn.cursor()
             cursor.execute("SELECT inn FROM businesses WHERE inn = ?", (inn,))
             if cursor.fetchone():
-                # Обновляем имя компании
                 cursor.execute("UPDATE businesses SET name = ? WHERE inn = ?", (name, inn))
-                print(f"[INFO] Компания с ИНН {inn} обновлена.")
+                print(f"[INFO] Обновлена компания с ИНН {inn}")
             else:
-                # Регистрируем новую компанию
                 cursor.execute("INSERT INTO businesses (inn, name) VALUES (?, ?)", (inn, name))
-                print(f"[INFO] Компания '{name}' с ИНН {inn} зарегистрирована.")
+                print(f"[INFO] Добавлена новая компания с ИНН {inn}")
 
     def issue_tokens(self, inn: str, amount: float):
-        """Выпускает токены для бизнеса по ИНН. Если уже есть — перезаписывает."""
+        """Выпускает токены для бизнеса по ИНН (перезаписывает предыдущее значение)."""
         if amount <= 0:
             raise ValueError("Количество токенов должно быть положительным.")
 
@@ -62,9 +70,7 @@ class DBManager:
                 """, (amount, inn))
                 print(f"[INFO] Токены для ИНН {inn} обновлены до {amount}.")
             else:
-                cursor.execute("""
-                    INSERT INTO token_issuances (business_inn, amount) VALUES (?, ?)
-                """, (inn, amount))
+                cursor.execute("INSERT INTO token_issuances (business_inn, amount) VALUES (?, ?)", (inn, amount))
                 print(f"[INFO] Выпущено {amount} токенов для ИНН {inn}.")
 
     def get_token_stats(self, inn: str):
@@ -98,4 +104,45 @@ class DBManager:
                 FROM businesses b
                 LEFT JOIN token_issuances t ON b.inn = t.business_inn
             """)
+            return cursor.fetchall()
+
+    def add_user_tokens(self, email: str, business_inn: str, amount: float):
+        """
+        Увеличивает количество токенов у пользователя.
+        """
+        with self.conn:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT tokens FROM user_tokens
+                WHERE email = ? AND business_inn = ?
+            """, (email, business_inn))
+
+            row = cursor.fetchone()
+            if row:
+                current_tokens = row[0]
+                new_tokens = current_tokens + amount
+                cursor.execute("""
+                    UPDATE user_tokens 
+                    SET tokens = ? 
+                    WHERE email = ? AND business_inn = ?
+                """, (new_tokens, email, business_inn))
+                print(f"[INFO] Обновлено количество токенов для {email} — бизнес {business_inn}")
+            else:
+                cursor.execute("""
+                    INSERT INTO user_tokens (email, business_inn, tokens) VALUES (?, ?, ?)
+                """, (email, business_inn, amount))
+                print(f"[INFO] Выдано {amount} токенов для {email} — бизнес {business_inn}")
+
+    def get_user_tokens(self, email: str):
+        """
+        Возвращает список всех токенов пользователя по компаниям.
+        """
+        with self.conn:
+            cursor = self.conn.cursor()
+            cursor.execute("""
+                SELECT ut.business_inn, b.name, ut.tokens
+                FROM user_tokens ut
+                JOIN businesses b ON ut.business_inn = b.inn
+                WHERE ut.email = ?
+            """, (email,))
             return cursor.fetchall()
