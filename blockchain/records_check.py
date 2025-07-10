@@ -6,7 +6,7 @@
 import sqlite3
 import os
 
-def get_db_connection(db_path="blockchain/database.sqlite"):
+def get_db_connection(db_path="database.sqlite"):
     """
     Создает подключение к базе данных SQLite.
     Проверяет, существует ли файл БД.
@@ -59,7 +59,7 @@ def print_table_contents(conn, table_name):
 def main():
     print("=== Проверка содержимого БД ===\n")
     
-    db_path = "blockchain/database.sqlite"
+    db_path = "database.sqlite"
     
     conn = get_db_connection(db_path)
     

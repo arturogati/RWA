@@ -12,7 +12,7 @@ class InvalidEmail(Exception):
     pass
 
 class UserManager:
-    def __init__(self, db_path="blockchain/database.sqlite"):
+    def __init__(self, db_path="database.sqlite"):
         self.conn = sqlite3.connect(db_path)
         self._initialize_tables()
 

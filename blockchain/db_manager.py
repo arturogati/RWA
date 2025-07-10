@@ -7,7 +7,7 @@
 import sqlite3
 
 class DBManager:
-    def __init__(self, db_path="blockchain/database.sqlite"):
+    def __init__(self, db_path="database.sqlite"):
         self.conn = sqlite3.connect(db_path)
         print(f"[DEBUG] Подключена база данных: {db_path}")
         self._initialize_tables()
