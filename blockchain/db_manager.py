@@ -55,23 +55,32 @@ class DBManager:
                 print(f"[INFO] Добавлена новая компания с ИНН {inn}")
 
     def issue_tokens(self, inn: str, amount: float):
-        """Выпускает токены для бизнеса по ИНН (перезаписывает предыдущее значение)."""
-        if amount <= 0:
-            raise ValueError("Количество токенов должно быть положительным.")
-
+        """
+        Обновляет количество токенов для бизнеса.
+        Положительное значение — увеличивает.
+        Отрицательное значение — уменьшает.
+        """
         with self.conn:
             cursor = self.conn.cursor()
-            cursor.execute("SELECT business_inn FROM token_issuances WHERE business_inn = ?", (inn,))
-            if cursor.fetchone():
-                cursor.execute("""
-                    UPDATE token_issuances 
-                    SET amount = ?, issued_at = CURRENT_TIMESTAMP 
-                    WHERE business_inn = ?
-                """, (amount, inn))
-                print(f"[INFO] Токены для ИНН {inn} обновлены до {amount}.")
-            else:
-                cursor.execute("INSERT INTO token_issuances (business_inn, amount) VALUES (?, ?)", (inn, amount))
-                print(f"[INFO] Выпущено {amount} токенов для ИНН {inn}.")
+            cursor.execute("SELECT business_inn, amount FROM token_issuances WHERE business_inn = ?", (inn,))
+            row = cursor.fetchone()
+
+            if not row:
+                raise ValueError(f"Компания с ИНН {inn} не найдена")
+
+            current_amount = row[1]
+            new_amount = current_amount + amount
+
+            if new_amount < 0:
+                raise ValueError(f"Недостаточно токенов для списания. Осталось: {current_amount}")
+
+            cursor.execute("""
+                UPDATE token_issuances 
+                SET amount = ?, issued_at = CURRENT_TIMESTAMP 
+                WHERE business_inn = ?
+            """, (new_amount, inn))
+
+            print(f"[INFO] Токены для ИНН {inn} обновлены до {new_amount}.")
 
     def get_token_stats(self, inn: str):
         """Возвращает информацию о токенах по ИНН."""
