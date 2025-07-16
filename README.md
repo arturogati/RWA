@@ -61,7 +61,7 @@ graph TD
 ---
 
 ### 2. **Проверка компании через API**
-
+```
 graph TD
     F[/issue_tokens] --> G[FinancialAPIClient.get_company_info()]
     G --> H{Проверка статуса: "Действует"}
