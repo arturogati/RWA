@@ -1,6 +1,6 @@
 """
-Ответственность:
-Логика верификации бизнеса через API финансовой отчетности.
+Responsibilities:
+Business verification logic using financial reporting API.
 """
 
 from verification.api_client import FinancialAPIClient
@@ -11,7 +11,7 @@ class BusinessVerifier:
 
     def verify(self, inn: str) -> dict:
         """
-        Проверяет бизнес через API финансовой отчетности.
+        Verifies business using financial reporting API.
         """
         try:
             company_info = self.financial_client.get_company_info(inn)

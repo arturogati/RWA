@@ -1,7 +1,7 @@
 """
-Ответственность:
-Управление бизнесами, токенами и балансами пользователей.
-Поддерживает обновление существующих записей.
+Responsibilities:
+Management of businesses, tokens, and user balances.
+Supports updating existing records.
 """
 
 import sqlite3
@@ -9,11 +9,11 @@ import sqlite3
 class DBManager:
     def __init__(self, db_path="database.sqlite"):
         self.conn = sqlite3.connect(db_path)
-        print(f"[DEBUG] Подключена база данных: {db_path}")
+        print(f"[DEBUG] Database connected: {db_path}")
         self._initialize_tables()
 
     def _initialize_tables(self):
-        """Создание таблиц при первом запуске."""
+        """Create tables on first run."""
         with self.conn:
             cursor = self.conn.cursor()
             cursor.execute("""
@@ -40,25 +40,25 @@ class DBManager:
                     FOREIGN KEY(business_inn) REFERENCES businesses(inn)
                 )
             """)
-            print("[DEBUG] Таблицы проверены/созданы.")
+            print("[DEBUG] Tables verified/created.")
 
     def register_or_update_business(self, inn: str, name: str):
-        """Регистрирует или обновляет данные о компании."""
+        """Registers or updates company data."""
         with self.conn:
             cursor = self.conn.cursor()
             cursor.execute("SELECT inn FROM businesses WHERE inn = ?", (inn,))
             if cursor.fetchone():
                 cursor.execute("UPDATE businesses SET name = ? WHERE inn = ?", (name, inn))
-                print(f"[INFO] Обновлена компания с ИНН {inn}")
+                print(f"[INFO] Updated company with TIN {inn}")
             else:
                 cursor.execute("INSERT INTO businesses (inn, name) VALUES (?, ?)", (inn, name))
-                print(f"[INFO] Добавлена новая компания с ИНН {inn}")
+                print(f"[INFO] Added new company with TIN {inn}")
 
     def issue_tokens(self, inn: str, amount: float):
         """
-        Обновляет количество токенов для бизнеса.
-        Положительное значение — увеличивает.
-        Отрицательное значение — уменьшает.
+        Updates token amount for a business.
+        Positive value - increases.
+        Negative value - decreases.
         """
         with self.conn:
             cursor = self.conn.cursor()
@@ -66,13 +66,13 @@ class DBManager:
             row = cursor.fetchone()
 
             if not row:
-                raise ValueError(f"Компания с ИНН {inn} не найдена")
+                raise ValueError(f"Company with TIN {inn} not found")
 
             current_amount = row[1]
             new_amount = current_amount + amount
 
             if new_amount < 0:
-                raise ValueError(f"Недостаточно токенов для списания. Осталось: {current_amount}")
+                raise ValueError(f"Insufficient tokens for withdrawal. Remaining: {current_amount}")
 
             cursor.execute("""
                 UPDATE token_issuances 
@@ -80,10 +80,10 @@ class DBManager:
                 WHERE business_inn = ?
             """, (new_amount, inn))
 
-            print(f"[INFO] Токены для ИНН {inn} обновлены до {new_amount}.")
+            print(f"[INFO] Tokens for TIN {inn} updated to {new_amount}.")
 
     def get_token_stats(self, inn: str):
-        """Возвращает информацию о токенах по ИНН."""
+        """Returns token information by TIN."""
         with self.conn:
             cursor = self.conn.cursor()
             cursor.execute("""
@@ -94,7 +94,7 @@ class DBManager:
             """, (inn,))
             result = cursor.fetchone()
             if not result:
-                return {"error": "Компания не найдена или токены не выпущены."}
+                return {"error": "Company not found or no tokens issued."}
 
             amount, issued_at, name = result
             return {
@@ -105,7 +105,7 @@ class DBManager:
             }
 
     def get_all_issuances(self):
-        """Возвращает все записи о выпуске токенов."""
+        """Returns all token issuance records."""
         with self.conn:
             cursor = self.conn.cursor()
             cursor.execute("""
@@ -117,7 +117,7 @@ class DBManager:
 
     def add_user_tokens(self, email: str, business_inn: str, amount: float):
         """
-        Увеличивает количество токенов у пользователя.
+        Increases user's token amount.
         """
         with self.conn:
             cursor = self.conn.cursor()
@@ -135,16 +135,16 @@ class DBManager:
                     SET tokens = ? 
                     WHERE email = ? AND business_inn = ?
                 """, (new_tokens, email, business_inn))
-                print(f"[INFO] Обновлено количество токенов для {email} — бизнес {business_inn}")
+                print(f"[INFO] Updated token amount for {email} - business {business_inn}")
             else:
                 cursor.execute("""
                     INSERT INTO user_tokens (email, business_inn, tokens) VALUES (?, ?, ?)
                 """, (email, business_inn, amount))
-                print(f"[INFO] Выдано {amount} токенов для {email} — бизнес {business_inn}")
+                print(f"[INFO] Issued {amount} tokens to {email} - business {business_inn}")
 
     def get_user_tokens(self, email: str):
         """
-        Возвращает список всех токенов пользователя по компаниям.
+        Returns all user tokens by company.
         """
         with self.conn:
             cursor = self.conn.cursor()

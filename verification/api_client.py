@@ -1,7 +1,7 @@
 """
-Ответственность:
-Клиент для взаимодействия с Checko API через /v2/finances
-Проверяет, существует ли компания по ИНН и действителен ли её статус ("Действует")
+Responsibilities:
+Client for interacting with Checko API via /v2/finances
+Checks if a company exists by INN and whether its status is "Active"
 """
 
 import requests
@@ -14,14 +14,14 @@ class FinancialAPIClient:
 
     def fetch_company_data(self, inn: str) -> dict:
         """
-        Получает данные компании через /v2/finances
-        Проверяет:
-        - Статус HTTP (200 OK)
+        Retrieves company data via /v2/finances
+        Verifies:
+        - HTTP status (200 OK)
         - meta.status == 'ok'
-        - Наличие данных в поле company
-        - company.Статус == 'Действует'
+        - Presence of data in company field
+        - company.Status == 'Active'
         """
-        print(f"[DEBUG] Отправляем запрос к Checko для ИНН {inn}...")
+        print(f"[DEBUG] Sending request to Checko for INN {inn}...")
 
         params = {
             "key": self.api_key,
@@ -31,48 +31,48 @@ class FinancialAPIClient:
         try:
             response = requests.get(self.BASE_URL, params=params)
         except requests.exceptions.RequestException as e:
-            raise Exception(f"Ошибка сети: {e}")
+            raise Exception(f"Network error: {e}")
 
         if response.status_code != 200:
-            raise Exception(f"Ошибка HTTP: {response.status_code}, Текст: {response.text}")
+            raise Exception(f"HTTP error: {response.status_code}, Text: {response.text}")
 
         try:
             data = response.json()
         except ValueError:
-            raise Exception("Не удалось разобрать JSON от Checko.")
+            raise Exception("Failed to parse JSON from Checko.")
 
-        # Проверяем meta.status
+        # Verify meta.status
         meta = data.get("meta", {})
         if meta.get("status") != "ok":
-            error_msg = meta.get("message", "Неизвестная ошибка")
-            raise Exception(f"Ошибка в метаданных Checko: {error_msg}")
+            error_msg = meta.get("message", "Unknown error")
+            raise Exception(f"Checko metadata error: {error_msg}")
 
-        # Проверяем, есть ли данные о компании
+        # Verify company data exists
         company_info = data.get("company", {})
         if not company_info:
-            raise Exception("В ответе нет данных о компании. Возможно, ключ не поддерживает доступ к данным.")
+            raise Exception("Response contains no company data. The API key may not have sufficient permissions.")
 
-        # Проверяем статус компании
-        status = company_info.get("Статус")
-        if status != "Действует":
-            raise ValueError(f"Компания с ИНН {inn} не зарегистрирована или не действует. Статус: {status}")
+        # Verify company status
+        status = company_info.get("Status")
+        if status != "Active":
+            raise ValueError(f"Company with INN {inn} is not registered or inactive. Status: {status}")
 
         return data
 
     def get_company_info(self, inn: str) -> dict:
         """
-        Возвращает основные данные о компании.
+        Returns core company information.
         """
         data = self.fetch_company_data(inn)
         company = data.get("company", {})
 
         return {
-            "name": company.get("НаимПолн", "Название компании не найдено"),
-            "short_name": company.get("НаимСокр", "Сокращённое название не найдено"),
-            "status": company.get("Статус", "Статус не найден"),
-            "ogrn": company.get("ОГРН", "ОГРН не найден"),
-            "kpp": company.get("КПП", "КПП не найден"),
-            "registration_date": company.get("ДатаРег", "Дата регистрации не найдена"),
-            "address": company.get("ЮрАдрес", "Адрес не найден"),
-            "okved": company.get("ОКВЭД", "ОКВЭД не найден")
+            "name": company.get("FullName", "Company name not found"),
+            "short_name": company.get("ShortName", "Short name not found"),
+            "status": company.get("Status", "Status not found"),
+            "ogrn": company.get("OGRN", "OGRN not found"),
+            "kpp": company.get("KPP", "KPP not found"),
+            "registration_date": company.get("RegDate", "Registration date not found"),
+            "address": company.get("LegalAddress", "Address not found"),
+            "okved": company.get("OKVED", "OKVED not found")
         }

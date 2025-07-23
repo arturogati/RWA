@@ -1,6 +1,6 @@
 """
-Ответственность:
-Регистрация, аутентификация и работа с пользователями.
+Responsibilities:
+User registration, authentication and management.
 """
 
 import sqlite3
@@ -17,7 +17,7 @@ class UserManager:
         self._initialize_tables()
 
     def _initialize_tables(self):
-        """Создание таблиц при первом запуске."""
+        """Create tables on first run."""
         with self.conn:
             self.conn.execute("""
                 CREATE TABLE IF NOT EXISTS users (
@@ -27,12 +27,12 @@ class UserManager:
                     password TEXT NOT NULL
                 )
             """)
-            print("[DEBUG] Таблица 'users' проверена/создана.")
+            print("[DEBUG] 'users' table verified/created.")
 
     def register_user(self, name: str, email: str, password: str):
-        """Регистрирует нового пользователя."""
+        """Registers a new user."""
         if "@" not in email:
-            raise InvalidEmail("Некорректный формат email")
+            raise InvalidEmail("Invalid email format")
 
         with self.conn:
             try:
@@ -41,14 +41,14 @@ class UserManager:
                     "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
                     (name, email, password)
                 )
-                print(f"[INFO] Зарегистрирован пользователь: {email}")
+                print(f"[INFO] Registered user: {email}")
             except sqlite3.IntegrityError:
-                raise UserAlreadyExists(f"Пользователь с email '{email}' уже существует.")
+                raise UserAlreadyExists(f"User with email '{email}' already exists")
             except Exception as e:
-                raise Exception(f"Ошибка при регистрации: {e}")
+                raise Exception(f"Registration error: {e}")
 
     def authenticate_user(self, email: str, password: str):
-        """Проверяет логин и пароль."""
+        """Verifies login credentials."""
         cursor = self.conn.cursor()
         cursor.execute("SELECT password FROM users WHERE email = ?", (email,))
         result = cursor.fetchone()
@@ -57,7 +57,7 @@ class UserManager:
         return False
 
     def find_user_by_email(self, email: str):
-        """Ищет пользователя по email."""
+        """Finds user by email."""
         cursor = self.conn.cursor()
         cursor.execute("SELECT name, email FROM users WHERE email = ?", (email,))
         result = cursor.fetchone()

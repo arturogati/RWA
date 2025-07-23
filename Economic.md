@@ -1,416 +1,303 @@
-
-
 ---
-
 # 🌐 **TokenizeLocal**  
-## **Токенизация малого бизнеса с автоматическими выплатами дивидендов**
-
-### 🔍 1. Проблема
-
-Малый и средний бизнес сталкивается с рядом проблем:
-
-| Проблема | Описание |
+## **Tokenization of Small Businesses with Automated Dividend Payouts**
+### 🔍 1. Problem
+Small and medium-sized businesses face a number of challenges:
+| Problem | Description |
 |--------|----------|
-| Недостаток инвестиций | Банки неохотно кредитуют, а фонды игнорируют небольшие проекты. |
-| Ликвидность доли бизнеса | Инвесторам сложно выйти из сделки или продать свою долю. |
-| Доверие к данным | Финансовая отчётность часто недоступна или непрозрачна. |
-| Выплата прибыли | Нет механизма автоматического распределения доходов между инвесторами. |
-
+| Lack of investment | Banks are reluctant to lend, and funds often ignore small projects. |
+| Share liquidity | Investors find it difficult to exit or sell their stake. |
+| Trust in data | Financial statements are often inaccessible or opaque. |
+| Profit distribution | No mechanism exists for automatically distributing profits among investors. |
 ---
-
-### 💡 2. Решение
-
-**TokenizeLocal** — это платформа для токенизации долей бизнеса через централизованную систему на основе базы данных. Она позволяет:
-- Бизнесу выпускать токены, привязанные к доле его выручки.
-- Инвесторам покупать токены и получать **ежемесячные дивиденды**.
-- Платформе расти от простой БД до блокчейн-экосистемы.
-
+### 💡 2. Solution
+**TokenizeLocal** is a platform for tokenizing business shares through a centralized system based on a database. It enables:
+- Businesses to issue tokens tied to a share of their revenue.
+- Investors to purchase tokens and receive **monthly dividends**.
+- The platform to evolve from a simple database to a full blockchain ecosystem.
 ---
-
-### 📈 3. Как это работает?
-
-#### Для бизнеса:
-1. **Регистрация по ИНН** → через Checko API проверяется статус компании.
-2. **Выпуск токенов** → определяется количество и процент выручки, который будет распределяться.
-3. **Обновление данных о прибыли** → данные о выручке передаются в систему.
-4. **Автоматическое распределение дивидендов** → сумма делится между всеми держателями токенов.
-
-#### Для пользователя / инвестора:
-1. **Регистрация/авторизация** → email + пароль.
-2. **Выбор бизнеса** → просмотр компаний и доступных токенов.
-3. **Покупка токенов** → пользователь получает токены.
-4. **Ежемесячные дивиденды** → выплаты пропорциональны количеству токенов.
-
+### 📈 3. How It Works?
+#### For a business:
+1. **Registration by INN** → Company status is verified via Checko API.
+2. **Token issuance** → The number of tokens and the percentage of revenue to be distributed are determined.
+3. **Updating revenue data** → Revenue information is submitted to the system.
+4. **Automated dividend distribution** → Funds are distributed among all token holders.
+#### For a user / investor:
+1. **Registration/authentication** → Email + password.
+2. **Select a business** → View available companies and token quantities.
+3. **Purchase tokens** → User receives tokens.
+4. **Monthly dividends** → Payouts proportional to the number of tokens held.
 ---
-
-### 🧩 4. Структура проекта
-
-На старте система построена на централизованной базе данных (`SQLite`) с возможностью расширения на будущее:
-- **blockchain/db_manager.py** — управляет компаниями, токенами и балансом пользователей.
-- **verification/api_client.py** — проверяет статус компании через Checko API.
-- **utils/logger.py** — логирование событий.
-- **main.py** — точка входа, реализует всю бизнес-логику.
-- **blockchain/users.py** — регистрация и авторизация пользователей.
-- **blockchain/register_user.py** — отдельный скрипт регистрации.
-- **blockchain/records_check.py** — проверка содержимого БД.
-
+### 🧩 4. Project Structure
+Initially, the system is built on a centralized database (`SQLite`) with future scalability in mind:
+- **blockchain/db_manager.py** — Manages businesses, tokens, and user balances.
+- **verification/api_client.py** — Verifies company status via Checko API.
+- **utils/logger.py** — Logs system events.
+- **main.py** — Entry point, implements all business logic.
+- **blockchain/users.py** — Handles user registration and authentication.
+- **blockchain/register_user.py** — Standalone registration script.
+- **blockchain/records_check.py** — Checks database contents.
 ---
-
-### 📁 5. Таблицы базы данных
-
-| Таблица | Описание |
+### 📁 5. Database Tables
+| Table | Description |
 |--------|----------|
-| `businesses` | Хранит ИНН и название компании |
-| `token_issuances` | Количество выпущенных токенов |
-| `users` | Email, имя, пароль |
-| `user_tokens` | Баланс токенов у каждого пользователя |
-| `dividend_history` *(опционально)* | История выплат дивидендов |
-
+| `businesses` | Stores INN and company name |
+| `token_issuances` | Number of issued tokens |
+| `users` | Email, name, password |
+| `user_tokens` | Token balance for each user |
+| `dividend_history` *(optional)* | Dividend payment history |
 ---
-
-### 💰 6. Механизм начисления дивидендов
-
-Каждый месяц система:
-1. Получает выручку бизнеса (например, из финансовой отчетности).
-2. Устанавливает размер дивидендов (например, 10% от выручки).
-3. Распределяет деньги пропорционально числу токенов у каждого пользователя.
-
-#### Пример:
-- Общее число токенов: **10 000**
-- Прибыль бизнеса: **$10 000**
-- Процент дивидендов: **10%**
-- Общий фонд дивидендов: **$1 000**
-
-👉 Пользователь с 200 токенами получает:  
-**$1 000 × (200 / 10 000) = $20**
-
+### 💰 6. Dividend Calculation Mechanism
+Each month, the system:
+1. Retrieves the business’s revenue (e.g., from financial reports).
+2. Sets the dividend amount (e.g., 10% of revenue).
+3. Distributes funds proportionally based on the number of tokens held by each user.
+#### Example:
+- Total number of tokens: **10,000**
+- Business revenue: **$10,000**
+- Dividend percentage: **10%**
+- Total dividend pool: **$1,000**
+👉 A user with 200 tokens receives:  
+**$1,000 × (200 / 10,000) = $20**
 ---
-
-### 📊 7. Экономическая модель
-
-#### Цена токена
-Определяется выручкой компании и количеством выпущенных токенов.  
-Пример:  
-- Компания получает $10 000 выручки в месяц.
-- Выделяет 10% → $1 000 под токены.
-- Выпущено 10 000 токенов → **1 токен = $0.1 в месяц**.
-
+### 📊 7. Economic Model
+#### Token Price
+Determined by company revenue and the number of tokens issued.  
+Example:  
+- Company earns $10,000 in monthly revenue.
+- Allocates 10% → $1,000 for dividends.
+- Issues 10,000 tokens → **1 token = $0.1 per month**.
 #### ROI (Return on Investment)
-Если инвестор купил 1000 токенов за $100 → он будет получать $10/месяц → **ROI ~10% в месяц**.
-
+If an investor buys 1,000 tokens for $100 → receives $10/month → **ROI ~10% per month**.
 ---
-
-### 🔄 8. Вторичный рынок токенов
-
-Сейчас токены записываются в БД, но уже предусмотрена возможность перепродажи.  
-В дальнейшем можно запустить внутреннюю DEX, где:
-- Цену токена формируют спрос и предложение.
-- Токены можно торговать между собой.
-- Цена зависит от роста бизнеса и его выручки.
-
+### 🔄 8. Secondary Token Market
+Currently, tokens are recorded in the database, but resale functionality is already designed.  
+In the future, an internal DEX can be launched where:
+- Token prices are determined by supply and demand.
+- Users can trade tokens directly.
+- Prices depend on business growth and revenue.
 ---
-
-### 📉 9. Что влияет на цену токена?
-
-| Фактор | Влияние |
+### 📉 9. What Affects Token Price?
+| Factor | Impact |
 |--------|----------|
-| Рост выручки | ➕ Токены дорожают |
-| Увеличение периода дивидендов | ➕ Выше общая стоимость |
-| Увеличение процента выручки | ➕ Выше дивиденды |
-| Снижение выручки | ➖ Токены теряют ценность |
-| Ликвидация бизнеса | ❌ Токены обесцениваются |
-
+| Revenue growth | ➕ Tokens increase in value |
+| Extended dividend period | ➕ Higher overall value |
+| Increased revenue percentage | ➕ Higher dividends |
+| Revenue decline | ➖ Tokens lose value |
+| Business liquidation | ❌ Tokens become worthless |
 ---
-
-### 📦 10. Возможности для масштабирования
-
-| Возможность | Описание |
+### 📦 10. Scalability Opportunities
+| Opportunity | Description |
 |------------|----------|
-| **DAO управление** | Инвесторы могут голосовать за развитие бизнеса |
-| **Вторичный рынок** | Перепродажа токенов между пользователями |
-| **Интеграция с блокчейном** | Поддержка Polygon / TON для децентрализованного рынка |
-| **Глобальные инвесторы** | Поддержка USDT, USDC, ETH |
-| **Страхование активов** | Защита от банкротства через DAO |
-| **Выплаты в стейблкоинах** | Чтобы минимизировать волатильность |
-
+| **DAO governance** | Investors can vote on business development |
+| **Secondary market** | Resale of tokens between users |
+| **Blockchain integration** | Support for Polygon / TON for decentralized markets |
+| **Global investors** | Support for USDT, USDC, ETH |
+| **Asset insurance** | Protection against bankruptcy via DAO |
+| **Payouts in stablecoins** | To minimize volatility |
 ---
-
-### 📈 11. Выгоды для сторон
-
-#### 👤 Для пользователя / инвестора:
-- Получает регулярные дивиденды.
-- Может купить всего 1 токен.
-- Если бизнес развивается — цена токена растёт.
-- Можно продать токены с прибылью.
-- Все данные прозрачны.
-
-#### 🏢 Для бизнеса:
-- Получает капитал без банковских процентов.
-- Может привлечь глобальных инвесторов.
-- Гибкая модель выпуска.
-- Автоматические выплаты.
-- Возможность развития через голосование инвесторов.
-
+### 📈 11. Benefits for Stakeholders
+#### 👤 For the user / investor:
+- Receives regular dividends.
+- Can buy as little as 1 token.
+- If the business grows, token value increases.
+- Can sell tokens at a profit.
+- All data is transparent.
+#### 🏢 For the business:
+- Gains capital without bank interest.
+- Can attract global investors.
+- Flexible issuance model.
+- Automated payouts.
+- Potential for growth through investor voting.
 ---
-
-### 📊 12. Пример модели: кафе "Шоколадница"
-
-#### Предположения:
-- Выпуск: 10 000 токенов.
-- Дивидендная часть: 10% от выручки.
-- Средняя выручка: $10 000/мес.
-- ROI: $10 000 × 10% = $1 000/мес
-
-👉 Пользователь с 1 000 токенов получает $100 в год на начальном этапе.  
-Если бизнес вырастет в 2 раза, то и дивиденды удвоятся.
-
+### 📊 12. Example Model: "Shokoladnitsa" Café
+#### Assumptions:
+- Token issuance: 10,000 tokens.
+- Dividend share: 10% of revenue.
+- Average monthly revenue: $10,000.
+- Dividend pool: $10,000 × 10% = $1,000/month
+👉 A user with 1,000 tokens receives $100 annually initially.  
+If the business doubles in size, dividends will also double.
 ---
-
-### 📈 13. Прогноз изменения стоимости токена
-
-| Месяц | Выручка | Дивидендный пул | Цена токена |
+### 📈 13. Token Value Growth Forecast
+| Month | Revenue | Dividend Pool | Token Price |
 |-------|--------|------------------|-------------|
-| 1     | $10 000 | $1 000           | $0.10       |
-| 3     | $12 000 | $1 200           | $0.12       |
-| 6     | $15 000 | $1 500           | $0.15       |
-| 9     | $18 000 | $1 800           | $0.18       |
-| 12    | $20 000 | $2 000           | $0.20       |
-
-👉 Цена токена выросла на **100% за год**.  
-👉 Дивиденды принесли $1 200.  
-👉 Общий ROI: **220% за год**.
-
+| 1     | $10,000 | $1,000           | $0.10       |
+| 3     | $12,000 | $1,200           | $0.12       |
+| 6     | $15,000 | $1,500           | $0.15       |
+| 9     | $18,000 | $1,800           | $0.18       |
+| 12    | $20,000 | $2,000           | $0.20       |
+👉 Token price increased by **100% over the year**.  
+👉 Dividends generated $1,200.  
+👉 Total ROI: **220% over one year**.
 ---
-
-### 📦 14. Вторичный рынок токенов
-
-На старте токены хранятся в БД, но заложена возможность перепродажи.  
-
-#### Преимущества вторичного рынка:
-- Инвестор может **продать токены** другому пользователю.
-- Цена формируется **спросом и предложением**.
-- Если бизнес растёт, цена токена тоже растёт.
-- Пользователи могут выйти из инвестиции раньше окончания срока.
-
+### 📦 14. Secondary Token Market
+Initially, tokens are stored in the database, but resale functionality is already planned.  
+#### Advantages of a secondary market:
+- Investors can **sell tokens** to other users.
+- Prices are formed by **supply and demand**.
+- As the business grows, token value increases.
+- Users can exit their investment before the end of a term.
 ---
-
-### 📊 15. Монетизация для платформы
-
-| Этап | Что реализовать | Комиссия |
+### 📊 15. Platform Monetization
+| Stage | What to Implement | Fee |
 |------|----------------|-----------|
-| Выпуск токенов | Бизнес платит за токенизацию | 3–5% от собранной суммы |
-| Покупка токенов | Платформа берёт комиссию | 0.5–1% |
-| Перевод токенов | Перепродажа токенов | 0.1–0.5% |
-| Премиум-листинг | Топовые предложения | $500–$1000 за вывод |
-| Аналитика | Отчёты по бизнесу | $10–$50 в мес. |
-| Партнёрская программа | Привлечение новых участников | 2–5% за реферала |
-
+| Token issuance | Business pays for tokenization | 3–5% of raised amount |
+| Token purchase | Platform takes a commission | 0.5–1% |
+| Token transfer | Resale of tokens | 0.1–0.5% |
+| Premium listing | Top-tier offers | $500–$1,000 per listing |
+| Analytics | Business reports | $10–$50/month |
+| Affiliate program | Attracting new participants | 2–5% per referral |
 ---
-
-### 📈 16. Прогноз роста
-
-| Период | Бизнесы | Инвесторы | Доход |
+### 📈 16. Growth Forecast
+| Period | Businesses | Investors | Revenue |
 |--------|----------|-----------|--------|
-| Год 1 | 100      | 10 000    | $1 млн+ |
-| Год 2 | 1000     | 100 000   | $10 млн+ |
-| Год 3 | 10 000   | 1 млн+     | $100 млн+ |
-
+| Year 1 | 100      | 10,000    | $1M+ |
+| Year 2 | 1,000    | 100,000   | $10M+ |
+| Year 3 | 10,000   | 1M+       | $100M+ |
 ---
-
-### 🧠 17. Конкурентные преимущества
-
-| Преимущество | Реализация |
+### 🧠 17. Competitive Advantages
+| Advantage | Implementation |
 |-------------|------------|
-| Прозрачность | Все данные видны в БД |
-| Автоматические дивиденды | Выплаты ежемесячно |
-| Централизованная модель | Быстрый запуск, минимальные затраты |
-| Поддержка регуляций | Выпуск через SPV в юрисдикциях с clear compliance |
-| Гибкость модели | Легко адаптировать под разные бизнесы |
-
+| Transparency | All data visible in the database |
+| Automated dividends | Monthly payouts |
+| Centralized model | Fast launch, low costs |
+| Regulatory support | Issuance via SPV in compliant jurisdictions |
+| Model flexibility | Easily adaptable to different businesses |
 ---
-
-### 🌍 18. Целевая аудитория
-
-| Категория | Описание |
+### 🌍 18. Target Audience
+| Category | Description |
 |-----------|----------|
-| Малый бизнес | Кафе, магазины, вендинг, солнечные станции |
-| Индивидуальные инвесторы | Люди, желающие инвестировать в реальный сектор |
-| Краудфандинг-платформы | Интеграция с существующими системами |
-| DAO сообщества | Групповое управление активами |
-| RWA-фонды | Фонды, которые хотят диверсифицироваться |
-
+| Small businesses | Cafés, shops, vending machines, solar stations |
+| Individual investors | People wanting to invest in the real economy |
+| Crowdfunding platforms | Integration with existing systems |
+| DAO communities | Collective asset management |
+| RWA funds | Funds seeking diversification |
 ---
-
-### 🚀 19. Возможности масштабирования
-
-| Шаг | Что делать |
+### 🚀 19. Scalability Opportunities
+| Step | What to Do |
 |-----|------------|
-| CLI MVP | Полностью рабочий |
-| Web-версия | FastAPI / Flask + React |
-| Вторичный рынок | DEX поверх токенов |
-| Блокчейн | Выпуск через смарт-контракты |
-| DAO | Голосование за развитие бизнеса |
-| Global Market | Поддержка разных стран |
-
+| CLI MVP | Fully functional |
+| Web version | FastAPI / Flask + React |
+| Secondary market | DEX built on top of tokens |
+| Blockchain | Issuance via smart contracts |
+| DAO | Voting on business development |
+| Global Market | Support for multiple countries |
 ---
-
-### 📉 20. Риски и пути снижения
-
-| Риск | Решение |
+### 📉 20. Risks and Mitigation
+| Risk | Solution |
 |------|----------|
-| Юридические сложности | Работа через SPV в регулируемых юрисдикциях |
-| Финансовое мошенничество | Верификация через Open Banking |
-| Неверные данные о прибыли | Использование оракулов |
-| Зависимость от одного API | Добавление моковых данных и других API |
-| Высокий порог входа | Минимальная сумма инвестиций — $100 |
-| Выход инвестора | Вторичный рынок токенов |
-
+| Legal complexities | Operate via SPV in regulated jurisdictions |
+| Financial fraud | Verification via Open Banking |
+| Inaccurate revenue data | Use of oracles |
+| Dependency on a single API | Add mock data and integrate additional APIs |
+| High entry barrier | Minimum investment — $100 |
+| Investor exit | Secondary token market |
 ---
-
-### 🧮 21. Формула дивидендов
-
-$$ \text{Дивиденд на 1 токен} = \frac{\text{Выручка бизнеса} \times \text{Дивидендная доля}}{\text{Общее число токенов}} $$
-
-#### Пример:
-- Выручка: $10 000
-- Дивидендная доля: 10%
-- Токенов: 10 000
-
-$$ \text{Дивиденд на 1 токен} = \frac{10 000 \times 0.1}{10 000} = \$0.1 \text{ на токен} $$
-
+### 🧮 21. Dividend Formula
+$$ \text{Dividend per token} = \frac{\text{Business revenue} \times \text{Dividend share}}{\text{Total number of tokens}} $$
+#### Example:
+- Revenue: $10,000
+- Dividend share: 10%
+- Tokens: 10,000
+$$ \text{Dividend per token} = \frac{10,000 \times 0.1}{10,000} = \$0.1 \text{ per token} $$
 ---
-
-### 📈 22. Пример ROI для инвестора
-
-| Параметр | Значение |
+### 📈 22. Example ROI for an Investor
+| Parameter | Value |
 |----------|----------|
-| Куплено токенов | 1000 |
-| Цена токена | $0.1 |
-| Общая сумма | $100 |
-| Ежемесячные дивиденды | $10 |
-| Время владения | 12 месяцев |
-| Итого дивидендов | $120 |
-| Цена токена через год | $0.20 |
-| Выручка от продажи | $200 |
-| Общий ROI | **220% за год** |
-
+| Tokens purchased | 1,000 |
+| Token price | $0.1 |
+| Total amount | $100 |
+| Monthly dividends | $10 |
+| Holding period | 12 months |
+| Total dividends | $120 |
+| Token price after 1 year | $0.20 |
+| Sale proceeds | $200 |
+| Total ROI | **220% over one year** |
 ---
-
-### 📊 23. Пример: развитие бизнеса и рост цены токена
-
-| Месяц | Выручка | % дивидендов | Цена токена |
+### 📊 23. Example: Business Growth and Token Price Increase
+| Month | Revenue | Dividend % | Token Price |
 |-------|--------|--------------|-------------|
-| 1     | $10 000 | 10%          | $0.10       |
-| 3     | $12 000 | 10%          | $0.12       |
-| 6     | $15 000 | 10%          | $0.15       |
-| 9     | $18 000 | 10%          | $0.18       |
-| 12    | $20 000 | 10%          | $0.20       |
-
-👉 Токен вырос в цене на 100%, а дивиденды обеспечили стабильный доход.
-
+| 1     | $10,000 | 10%          | $0.10       |
+| 3     | $12,000 | 10%          | $0.12       |
+| 6     | $15,000 | 10%          | $0.15       |
+| 9     | $18,000 | 10%          | $0.18       |
+| 12    | $20,000 | 10%          | $0.20       |
+👉 Token value increased by 100%, and dividends provided stable income.
 ---
-
-### 📌 24. Почему это интересно инвестору?
-
-- ✔️ **RWA становится одним из самых быстрорастущих направлений DeFi**.
-- ✔️ **Малый бизнес — огромный, недооцененный рынок**.
-- ✔️ **Автоматическое распределение прибыли — высокая ликвидность**.
-- ✔️ **Можно начать с России, потом масштабироваться на весь мир**.
-
+### 📌 24. Why Is This Interesting for Investors?
+- ✔️ **RWA is becoming one of the fastest-growing sectors in DeFi**.
+- ✔️ **Small business is a vast, undervalued market**.
+- ✔️ **Automated profit distribution ensures high liquidity**.
+- ✔️ **Can start in Russia, then scale globally**.
 ---
-
-### 📦 25. Что можно добавить дальше?
-
-| Функция | Описание |
+### 📦 25. What Can Be Added Next?
+| Feature | Description |
 |---------|----------|
-| **Токены как NFT** | Уникальные права на дивиденды |
-| **DAO управление** | Голосование за развитие бизнеса |
-| **Графики доходности** | Для анализа и выбора |
-| **Поддержка нескольких валют** | RUB, USD, USDT, USDC |
-| **Автоматический выкуп токенов** | Бизнес может выкупить свои токены |
-| **Страхование токенов** | Защита от банкротства |
-
+| **Tokens as NFTs** | Unique dividend rights |
+| **DAO governance** | Voting on business development |
+| **Yield charts** | For analysis and selection |
+| **Multi-currency support** | RUB, USD, USDT, USDC |
+| **Automated token buyback** | Business can repurchase its own tokens |
+| **Token insurance** | Protection against bankruptcy |
 ---
-
-### 📈 26. Путь развития токена
-
+### 📈 26. Token Development Path
 ```
-Эмиссия → Первичная продажа → Рост бизнеса → Рост цены → Вторичный рынок → Выход инвестора
+Issuance → Primary sale → Business growth → Price increase → Secondary market → Investor exit
 ```
-
 ---
-
-### 🧑‍💼 27. Кто в команде?
-
-| Роль | Описание |
+### 🧑‍💼 27. Team
+| Role | Description |
 |------|----------|
-| **CEO** | Опыт в fintech и RWA |
-| **CTO** | Разработчик Python / БД / блокчейн |
-| **Legal** | Знание MiCA и SEC |
-| **Marketing** | Привлечение бизнесов и инвесторов |
-
+| **CEO** | Experience in fintech and RWA |
+| **CTO** | Python / DB / blockchain developer |
+| **Legal** | Knowledge of MiCA and SEC regulations |
+| **Marketing** | Attracting businesses and investors |
 ---
-
-### 📈 28. Рынок и потенциал
-
-| Сегмент | Размер |
+### 📈 28. Market and Potential
+| Segment | Size |
 |--------|--------|
-| RWA рынок (Real World Assets) | Ожидается $10 трлн к 2030 году (BCG) |
-| Малый бизнес в РФ | ~5 млн компаний |
-| Глобальный SaaS для SMB | ~$200 млрд ежегодно |
-
+| RWA market (Real World Assets) | Projected $10 trillion by 2030 (BCG) |
+| Small businesses in Russia | ~5 million companies |
+| Global SaaS for SMBs | ~$200 billion annually |
 ---
-
-### ✨ 29. Уникальное предложение
-
-| Что делаем | Чем отличаемся |
+### ✨ 29. Unique Value Proposition
+| What We Do | How We Differ |
 |-----------|----------------|
-| Токенизация бизнеса | Не только крупные активы, но и кафе, вендинг, Solar Energy |
-| Централизованная модель | Быстрый запуск, дешево |
-| Выплата дивидендов | Пропорционально токенам |
-| Готов к блокчейну | Можно перейти на Polygon / TON |
-| Удобство для инвестора | Просмотр своих токенов и дивидендов |
-
+| Business tokenization | Not just large assets, but also cafés, vending, solar energy |
+| Centralized model | Fast launch, low cost |
+| Dividend payouts | Proportional to tokens held |
+| Blockchain-ready | Can transition to Polygon / TON |
+| Investor-friendly | Easy view of tokens and dividends |
 ---
-
-### 📈 30. Пример финансового потока
-
-Бизнес регистрируется, выпускает токены, собирает $10 000.  
-Инвестор A покупает 1000 токенов, B — 2000, C — 7000.  
-Ежемесячно все получают выплаты из пула дивидендов.  
-Если бизнес растёт, токены дорожают, и инвесторы могут их выгодно продать.
-
+### 📈 30. Example Financial Flow
+A business registers, issues tokens, and raises $10,000.  
+Investor A buys 1,000 tokens, B buys 2,000, C buys 7,000.  
+Monthly, all receive payouts from the dividend pool.  
+As the business grows, token value increases, allowing investors to sell at a profit.
 ---
-
-### 📊 31. Токены как акции малого бизнеса
-
-| Параметр | TokenizeLocal |
+### 📊 31. Tokens as Shares in Small Businesses
+| Parameter | TokenizeLocal |
 |----------|--------------|
-| Дивиденды | Да, ежемесячно |
-| Долевое участие | Да, через токены |
-| Вторичный рынок | Планируется |
-| Пассивный доход | Да |
-| Децентрализация | Планируется через блокчейн |
-| Риск | Умеренный, можно проверить бизнес |
-| ROI | 10–20% в месяц (в зависимости от бизнеса) |
-
+| Dividends | Yes, monthly |
+| Equity participation | Yes, via tokens |
+| Secondary market | Planned |
+| Passive income | Yes |
+| Decentralization | Planned via blockchain |
+| Risk | Moderate, business can be verified |
+| ROI | 10–20% per month (depending on business) |
 ---
-
-### 📈 32. План масштабирования
-
-| Шаг | Что реализовать |
+### 📈 32. Scaling Roadmap
+| Step | What to Implement |
 |-----|----------------|
-| 1. CLI MVP | Сейчас |
-| 2. REST API | 1 месяц |
-| 3. GUI интерфейс | 2 месяца |
-| 4. Блокчейн | 5–6 месяцев |
-| 5. DAO | 7–9 месяцев |
-| 6. Вторичный рынок | 10–12 месяцев |
-
+| 1. CLI MVP | Now |
+| 2. REST API | 1 month |
+| 3. GUI interface | 2 months |
+| 4. Blockchain | 5–6 months |
+| 5. DAO | 7–9 months |
+| 6. Secondary market | 10–12 months |
 ---
-
-### 📁 33. Итоговая структура проекта
-
+### 📁 33. Final Project Structure
 ```
 tokenize_local/
 │── README.md
@@ -419,39 +306,32 @@ tokenize_local/
 │── main.py
 │
 ├── blockchain/
-│   ├── db_manager.py         # Выпуск токенов и дивиденды
-│   ├── register_user.py      # Регистрация пользователей
-│   └── records_check.py      # Проверка содержимого БД
+│   ├── db_manager.py         # Token issuance and dividends
+│   ├── register_user.py      # User registration
+│   └── records_check.py      # Database content check
 │
 ├── verification/
-│   └── api_client.py        # Проверка компании через Checko
+│   └── api_client.py        # Company verification via Checko
 │
 ├── utils/
-│   └── logger.py            # Логирование действий
+│   └── logger.py            # Action logging
 │
 └── tests/
 ```
-
 ---
-
-### 📈 34. Итог
-
-> **TokenizeLocal** — это первая платформа, которая позволяет малым предприятиям привлечь капитал через токенизацию.  
-> Инвесторы получают:
-> - Дивиденды каждый месяц.
-> - Возможность роста цены токена.
-> - Возможность перепродажи.
-
-> Бизнес получает:
-> - Финансирование без кредита.
-> - Глобальный доступ к инвесторам.
-> - Гибкую модель с возможностью контроля.
-
-> Платформа готова к:
-> - Выходу на блокчейн.
-> - Внутренней бирже.
-> - DAO-управлению.
-> - Глобальному рынку токенов.
-
+### 📈 34. Conclusion
+> **TokenizeLocal** is the first platform enabling small enterprises to raise capital through tokenization.  
+> Investors receive:
+> - Monthly dividends.
+> - Potential for token price appreciation.
+> - Ability to resell tokens.
+> Businesses gain:
+> - Financing without loans.
+> - Global access to investors.
+> - Flexible model with control options.
+> The platform is ready for:
+> - Migration to blockchain.
+> - Internal exchange.
+> - DAO governance.
+> - Global token market.
 ---
-
