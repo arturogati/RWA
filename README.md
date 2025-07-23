@@ -1,135 +1,121 @@
 
----
-
-# 📊 **TokenizeLocal: Техническая документация**
-
-## 🔍 Общее описание  
-**TokenizeLocal** — это платформа для токенизации локальных бизнесов, позволяющая пользователям покупать цифровые токены, представляющие долю в реальном бизнесе.  
-Каждый токен даёт право на **ежемесячные дивиденды**, пропорциональные объёму выручки компании.
 
 ---
-
-## 🧠 Основные компоненты системы
-
+# 📊 **TokenizeLocal : Documentation technique**
+## 🔍 Description générale  
+**TokenizeLocal** est une plateforme de tokenisation des entreprises locales, permettant aux utilisateurs d’acheter des jetons numériques représentant une part dans une entreprise réelle.  
+Chaque jeton donne droit à des **dividendes mensuels**, proportionnels au chiffre d’affaires de l’entreprise.
+---
+## 🧠 Composants principaux du système
 ```
 +---------------------+
-|    Telegram Bot     |
-| (Пользовательский   |
-| интерфейс)          |
+|    Bot Telegram     |
+| (Interface          |
+| utilisateur)        |
 +----------+----------+
            |
            v
 +---------------------+
 |  TelegramBotHandler |
-| (Обработчики команд,|
-| состояния, логика)  |
+| (Gestionnaires de   |
+| commandes, états,    |
+| logique)             |
 +----------+----------+
            |
            v
 +---------------------+
 |      DBManager      |
-| (CRUD операции над  |
-| бизнесами, токенами |
-| и балансами)        |
+| (Opérations CRUD sur |
+| les entreprises,     |
+| les jetons et        |
+| les soldes)          |
 +----------+----------+
            |
            v
 +---------------------+
 |  FinancialAPIClient |
-| (Checko API /       |
-| международные АПИ)  |
+| (API Checko /        |
+| API internationales) |
 +----------+----------+
            |
            v
 +---------------------+
-|      База данных    |
-| (SQLite, файловая)  |
+|      Base de données|
+| (SQLite, fichier)   |
 +---------------------+
 ```
-
 ---
-
-## 🔄 Алгоритм работы системы
-
-### 1. **Регистрация компании**
+## 🔄 Algorithme de fonctionnement du système
+### 1. **Enregistrement de l’entreprise**
 ```
 graph TD
-    A[Компания] --> B[/issue_tokens]
-    B --> C[Ввод ИНН или VAT ID]
-    C --> D[Проверка формата: 10/12 цифр (ИНН), 8-12 символов (VAT)]
-    D --> E[Переход к этапу проверки статуса компании]
+    A[Entreprise] --> B[/issue_tokens]
+    B --> C[Saisie de l’INN ou du VAT ID]
+    C --> D[Validation du format : 10/12 chiffres (INN), 8-12 caractères (VAT)]
+    D --> E[Passage à l’étape de vérification du statut de l’entreprise]
 ```
-
-### 2. **Проверка компании через API**
+### 2. **Vérification de l’entreprise via l’API**
 ```
 graph TD
     F[/issue_tokens] --> G[FinancialAPIClient.get_company_info()]
-    G --> H{Проверка статуса: "Действует"}
-    H -->|Да| I[Получение финансовой отчетности]
-    H -->|Нет| J[Ошибка: компания не зарегистрирована]
-    I --> K[Рассчёт максимального количества токенов]
+    G --> H{Vérification du statut : "Actif"}
+    H -->|Oui| I[Obtention des états financiers]
+    H -->|Non| J[Erreur : entreprise non enregistrée]
+    I --> K[Calcul du nombre maximal de jetons]
 ```
-
 ---
-
-## 🛡️ Блок верификации компании
-
-### 1. **Компания регистрируется и вводит свой ИНН (или VAT ID)**  
-#### Поддерживаемые идентификаторы:
-| Страна | Идентификатор | Пример |
+## 🛡️ Bloc de vérification de l’entreprise
+### 1. **L’entreprise s’enregistre et saisit son INN (ou VAT ID)**  
+#### Identifiants pris en charge :
+| Pays | Identifiant | Exemple |
 |--------|----------------|--------|
-| Россия | ИНН            | 5009051111 |
-| США    | EIN            | 123456789 |
-| ЕС     | VAT ID         | DE276452187 |
-
-#### Проверка формата:
+| Russie | INN            | 5009051111 |
+| États-Unis | EIN            | 123456789 |
+| UE     | VAT ID         | DE276452187 |
+#### Vérification du format :
 ```python
 if not (len(inn) in (10, 12) and inn.isdigit()):
-    raise ValueError("❌ Неверный формат ИНН. Должно быть 10 или 12 цифр.")
+    raise ValueError("❌ Format INN invalide. Doit contenir 10 ou 12 chiffres.")
 ```
-
-### 2. **Через API происходит проверка статуса компании и её финансовой отчетности**  
-#### Используемые API:
-| Регион | API              | Функция |
+### 2. **Vérification du statut de l’entreprise et de ses états financiers via l’API**  
+#### API utilisées :
+| Région | API              | Fonction |
 |--------|------------------|---------|
-| РФ     | Checko API       | `get_company_info()` |
-| ЕС     | VIES             | Проверка VAT ID |
-| США    | Dun & Bradstreet | Проверка EIN и статуса |
-| Global | OpenCorporates   | Открытые данные по компаниям |
-
-#### Логика работы:
+| Russie | Checko API       | `get_company_info()` |
+| UE     | VIES             | Vérification du VAT ID |
+| États-Unis | Dun & Bradstreet | Vérification de l’EIN et du statut |
+| Global | OpenCorporates   | Données publiques sur les entreprises |
+#### Logique de fonctionnement :
 ```python
 def get_company_info(self, inn: str):
     """
-    Получает информацию о компании через Checko API.
-    Проверяет статус и финансовую отчетность.
+    Récupère les informations de l'entreprise via l'API Checko.
+    Valide le statut et les états financiers.
     """
     response = requests.get(f"{self.BASE_URL}?inn={inn}&key={self.api_key}")
     data = response.json()
     if data["meta"]["status"] != "ok":
         raise Exception(data["meta"]["message"])
     company = data.get("company", {})
-    if company.get("Статус") != "Действует":
-        raise ValueError(f"Компания не зарегистрирована или не действует. Статус: {company.get('Статус')}")
+    if company.get("Status") != "Active":
+        raise ValueError(f"Entreprise non enregistrée ou inactive. Statut : {company.get('Status')}")
     return {
-        "name": company.get("НаимПолн", "Неизвестное название"),
-        "short_name": company.get("НаимСокр", "Неизвестное сокращение"),
-        "status": company.get("Статус", "Неизвестный статус"),
-        "revenue": company.get("Выручка", 0)
+        "name": company.get("Full Name", "Nom inconnu"),
+        "short_name": company.get("Short Name", "Abréviation inconnue"),
+        "status": company.get("Status", "Statut inconnu"),
+        "revenue": company.get("Revenue", 0)
     }
 ```
-
-### 3. **Выпуск токенов**
-#### Ограничение по выручке:
+### 3. **Émission de jetons**
+#### Limite basée sur le chiffre d’affaires :
 ```python
 max_tokens = revenue * 0.1 / token_price
 ```
-> Пример:  
-Выручка: 1 000 000 ₽  
-Цена токена: 100 ₽  
-Максимальное количество токенов: 1000 шт.
-
-#### Метод:
+> Exemple :  
+Chiffre d’affaires : 1 000 000 ₽  
+Prix du jeton : 100 ₽  
+Nombre maximal de jetons : 1 000 unités.
+#### Méthode :
 ```python
 def issue_tokens(self, inn: str, amount: float):
     with self.conn:
@@ -140,246 +126,198 @@ def issue_tokens(self, inn: str, amount: float):
         else:
             cursor.execute("INSERT INTO token_issuances (business_inn, amount) VALUES (?, ?)", (inn, amount))
 ```
-
 ---
-
-## 🔄 Алгоритм работы системы
-
-### 1. **Регистрация компании**
+## 🔄 Algorithme de fonctionnement du système
+### 1. **Enregistrement de l’entreprise**
 ```
 graph TD
-    L[/issue_tokens] --> M[Ввод ИНН]
-    M --> N[Проверка формата]
+    L[/issue_tokens] --> M[Saisie de l’INN]
+    M --> N[Validation du format]
     N --> O[FinancialAPIClient.get_company_info()]
-    O --> P[Получение информации о статусе и выручке]
+    O --> P[Récupération des données de statut et de chiffre d’affaires]
     P --> Q[DBManager.register_or_update_business()]
-    Q --> R[Ввод количества токенов]
+    Q --> R[Saisie du nombre de jetons]
     R --> S[DBManager.issue_tokens()]
-    S --> T[Компания добавлена на рынок]
+    S --> T[Entreprise ajoutée au marché]
 ```
-
-### 2. **Покупка токенов пользователем**
+### 2. **Achat de jetons par l’utilisateur**
 ```
 graph TD
-    U[/buy] --> V[Выбор компании из списка]
-    V --> W[Ввод номера и количества]
-    W --> X[Проверка доступности токенов]
+    U[/buy] --> V[Sélection de l’entreprise dans la liste]
+    V --> W[Saisie du nombre et du montant]
+    W --> X[Validation de la disponibilité des jetons]
     X --> Y[DBManager.issue_tokens(inn, -amount)]
     Y --> Z[DBManager.add_user_tokens(email, inn, amount)]
-    Z --> AA[Уведомление о покупке]
+    Z --> AA[Notification de confirmation d’achat]
 ```
-
 ---
-
-## 🛠️ Техническая реализация
-
-### 1. **База данных (SQLite)**  
-#### Таблицы:
-| Таблица | Описание |
+## 🛠️ Implémentation technique
+### 1. **Base de données (SQLite)**  
+#### Tables :
+| Table | Description |
 |--------|----------|
-| `businesses` | Инн, имя компании |
-| `token_issuances` | Выпущенные токены, дата выпуска |
-| `users` | Email, имя, пароль |
-| `user_tokens` | Баланс токенов у пользователей |
-| `dividend_history` | История дивидендных выплат |
-
-#### Пример SQL:
+| `businesses` | INN, nom de l’entreprise |
+| `token_issuances` | Jetons émis, date d’émission |
+| `users` | Email, nom, mot de passe |
+| `user_tokens` | Solde de jetons des utilisateurs |
+| `dividend_history` | Historique des paiements de dividendes |
+#### Exemple SQL :
 ```sql
--- Просмотр всех компаний с токенами
+-- Afficher toutes les entreprises avec leurs jetons
 SELECT b.name, t.amount, t.issued_at
 FROM businesses b
 JOIN token_issuances t ON b.inn = t.business_inn;
 ```
-
 ---
-
-### 2. **Checko API**
-#### Запрос:
+### 2. **API Checko**
+#### Requête :
 ```python
 api_client = FinancialAPIClient(api_key="your_api_key")
-company_info = api_client.get_company_info("5009051111")  # ИНН ООО Шоколадница
+company_info = api_client.get_company_info("5009051111")  # INN de OOO Shokoladnitsa
 ```
-
-#### Ответ:
+#### Réponse :
 ```json
 {
-  "name": "ООО Шоколадница",
-  "status": "Действует",
+  "name": "OOO Shokoladnitsa",
+  "status": "Active",
   "inn": "5009051111",
   "ogrn": "1027700123456",
-  "address": "г. Москва, ул. Мясницкая, д. 1"
+  "address": "Moscou, rue Myasnitskaya, 1"
 }
 ```
-
 ---
-
 ### 3. **DBManager**
-#### Основные методы:
-- `register_or_update_business()` → добавляет или обновляет компанию.
-- `issue_tokens()` → выпускает или списывает токены.
-- `add_user_tokens()` → увеличивает баланс пользователя.
-- `distribute_dividends()` → распределение дивидендов.
-- `get_token_stats()` → информация о токенах.
-- `get_all_issuances()` → вывод всех компаний.
-
+#### Méthodes principales :
+- `register_or_update_business()` → ajoute ou met à jour une entreprise.
+- `issue_tokens()` → émet ou retire des jetons.
+- `add_user_tokens()` → augmente le solde utilisateur.
+- `distribute_dividends()` → distribue les dividendes.
+- `get_token_stats()` → récupère les informations sur les jetons.
+- `get_all_issuances()` → renvoie toutes les entreprises.
 ---
-
-### 4. **Telegram-бот**
-#### Функции:
-- Регистрация / авторизация
-- Выпуск токенов
-- Покупка токенов
-- Распределение дивидендов
-- Просмотр баланса
-- Поддержка форматов ввода
-- Логирование событий
-
+### 4. **Bot Telegram**
+#### Fonctionnalités :
+- Enregistrement / authentification
+- Émission de jetons
+- Achat de jetons
+- Distribution de dividendes
+- Consultation du solde
+- Prise en charge des formats de saisie
+- Journalisation des événements
 ---
-
-## ✅ Технические критерии приемки (TAC)
-
-| № | Критерий | Признак выполнения |
+## ✅ Critères techniques d’acceptation (TAC)
+| № | Critère | Indicateur d’achèvement |
 |---|---------|--------------------|
-| 1 | Регистрация компании | ✔️ Возможность регистрации через ИНН / VAT ID |
-| 2 | Проверка компании через API | ✔️ Успешный запрос и получение статуса |
-| 3 | Ограничение токенов по выручке | ✔️ Реализовано ограничение |
-| 4 | Выпуск токенов компанией | ✔️ Токены записываются в БД |
-| 5 | Обновление баланса после покупки | ✔️ Обновляется таблица `user_tokens` |
-| 6 | Просмотр истории токенов | ✔️ Команда `/balance` работает корректно |
-| 7 | Поддержка форматов ввода | ✔️ Корректная обработка чисел и форматов |
-| 8 | Хранение данных | ✔️ Все данные сохраняются в SQLite |
-| 9 | Интеграция с Telegram | ✔️ Бот запускается и отвечает на команды |
-| 10 | Логирование событий | ✔️ Все действия логируются |
-
+| 1 | Enregistrement de l’entreprise | ✔️ Possibilité d’enregistrement via INN / VAT ID |
+| 2 | Vérification de l’entreprise via API | ✔️ Requête réussie et statut récupéré |
+| 3 | Limite de jetons basée sur le chiffre d’affaires | ✔️ Limite implémentée |
+| 4 | Émission de jetons par l’entreprise | ✔️ Jetons enregistrés dans la base de données |
+| 5 | Mise à jour du solde après achat | ✔️ Table `user_tokens` mise à jour |
+| 6 | Consultation de l’historique des jetons | ✔️ Commande `/balance` fonctionne correctement |
+| 7 | Prise en charge des formats de saisie | ✔️ Gestion correcte des nombres et formats |
+| 8 | Stockage des données | ✔️ Toutes les données sauvegardées dans SQLite |
+| 9 | Intégration Telegram | ✔️ Le bot démarre et répond aux commandes |
+| 10 | Journalisation des événements | ✔️ Toutes les actions sont journalisées |
 ---
-
-## 📈 План масштабирования
-
-| Направление | Реализация |
+## 📈 Plan de montée en échelle
+| Direction | Implémentation |
 |------------|-------------|
-| REST API | FastAPI / Flask |
-| GUI интерфейс | Streamlit / Tkinter |
-| DAO управление | Snapshot / голосование в БД |
-| Вторичный рынок токенов | Перепродажа между пользователями |
-| Интеграция с блокчейном | web3.py + смарт-контракты |
-| Оракулы | Pyth Network / Chainlink |
-| Поддержка USDT / USDC | Для стабильности дивидендов |
-| Автоматический выпуск дивидендов | Через cron или Airflow |
-| Хэширование паролей | bcrypt / hashlib |
-| История операций | Таблица `dividend_history` |
-
+| API REST | FastAPI / Flask |
+| Interface GUI | Streamlit / Tkinter |
+| Gouvernance DAO | Snapshot / vote dans la base de données |
+| Marché secondaire de jetons | Revente entre utilisateurs |
+| Intégration blockchain | web3.py + contrats intelligents |
+| Oracle | Réseau Pyth / Chainlink |
+| Prise en charge de USDT / USDC | Pour la stabilité des dividendes |
+| Émission automatique de dividendes | via cron ou Airflow |
+| Hachage des mots de passe | bcrypt / hashlib |
+| Historique des transactions | Table `dividend_history` |
 ---
-
-## 📦 Что планируется реализовать
-
-### 1. **Ограничение потолка токенов в зависимости от дохода**  
-> Ввести лимит на максимальное количество токенов, которое может выпустить компания, исходя из её дохода и стоимости бизнеса.
-
-#### Как будет работать:
-- При выпуске токенов будет рассчитываться:
-  - Объём выручки за последний месяц
-  - Коэффициент капитализации
-- Максимальное количество токенов = (Выручка × Коэффициент) / Цена 1 токена
-
-#### Пример:
-- Выручка: 1 000 000 ₽
-- Коэффициент: 0.1
-- Цена токена: 100 ₽
-- Max токенов = (1 000 000 × 0.1) / 100 = 1000 токенов
-
+## 📦 Fonctionnalités prévues
+### 1. **Plafond de jetons basé sur le chiffre d’affaires de l’entreprise**  
+> Introduire une limite sur le nombre maximal de jetons qu’une entreprise peut émettre, en fonction de son chiffre d’affaires et de sa valorisation.
+#### Fonctionnement :
+- Lors de l’émission de jetons, les éléments suivants seront calculés :
+  - Chiffre d’affaires mensuel
+  - Coefficient de capitalisation
+- Nombre maximal de jetons = (Chiffre d’affaires × Coefficient) / Prix par jeton
+#### Exemple :
+- Chiffre d’affaires : 1 000 000 ₽
+- Coefficient : 0,1
+- Prix du jeton : 100 ₽
+- Nombre max de jetons = (1 000 000 × 0,1) / 100 = 1 000 jetons
 ---
-
-### 2. **Добавить API для получения информации о компаниях из Америки и Европы**  
-> Расширить географию и позволить инвестировать в международные бизнесы.
-
-#### Как будет реализовано:
-- Интеграция с аналогами Checko:
-  - **США**: Dun & Bradstreet, OpenCorporates
-  - **Европа**: Companies House (Великобритания), Business Register (ЕС)
-- Добавление поддержки идентификаторов:
-  - EIN (США)
-  - VAT ID (ЕС)
-- Расширение логики проверки статуса компании
-
+### 2. **Ajout d’API pour les données d’entreprises aux États-Unis et en Europe**  
+> Étendre la couverture géographique pour permettre l’investissement dans des entreprises internationales.
+#### Plan d’implémentation :
+- Intégrer des équivalents de Checko :
+  - **États-Unis** : Dun & Bradstreet, OpenCorporates
+  - **Europe** : Companies House (Royaume-Uni), Business Register (UE)
+- Ajouter la prise en charge des identifiants :
+  - EIN (États-Unis)
+  - VAT ID (UE)
+- Étendre la logique de validation du statut de l’entreprise
 ---
-
-### 3. **Выпуск токенов внутри собственной блокчейн-системы**  
-> Для повышения прозрачности и безопасности транзакций.
-
-#### Как будет реализовано:
-- Разработка легковесного блокчейна на Python (или интеграция с существующим)
-- Выпуск токенов как NFT или ERC-20 токенов
-- Использование смарт-контрактов для распределения дивидендов
-- Поддержка кошельков (MetaMask, Trust Wallet и др.)
-
+### 3. **Émission de jetons dans un système blockchain propriétaire**  
+> Améliorer la transparence et la sécurité des transactions.
+#### Plan d’implémentation :
+- Développer une blockchain légère en Python (ou intégrer une existante)
+- Émettre des jetons sous forme de NFT ou de jetons ERC-20
+- Utiliser des contrats intelligents pour la distribution des dividendes
+- Prendre en charge les portefeuilles (MetaMask, Trust Wallet, etc.)
 ---
-
-## 🧩 Планируемый вторичный рынок (DEX)
-
-### 🎯 Цель:
-Создать внутреннюю децентрализованную биржу (DEX), где пользователи смогут:
-- **Продавать и покупать токены напрямую**
-- **Формировать цену через спрос и предложение**
-- **Выходить из инвестиций в любой момент**
-
-### 📦 Возможности DEX:
-| Функция | Описание |
+## 🧩 Marché secondaire prévu (DEX)
+### 🎯 Objectif :
+Créer une bourse décentralisée interne (DEX) où les utilisateurs peuvent :
+- **Acheter et vendre des jetons directement**
+- **Déterminer le prix par l’offre et la demande**
+- **Sortir de l’investissement à tout moment**
+### 📦 Fonctionnalités du DEX :
+| Fonction | Description |
 |--------|----------|
-| Обмен токенами | Пользователи могут торговать токенами между собой |
-| Лимитные ордера | Установка цены и объёма |
-| Маркет ордера | Мгновенная покупка/продажа по рыночной цене |
-| Графики и аналитика | Просмотр ценовой динамики |
-| Стейкинг токенов | Защита от волатильности и рост ценности |
-| Пулы ликвидности | Участие в пулах для получения комиссий |
-| DAO-управление | Голосование за развитие бизнеса и платформы |
-
-### 💰 Монетизация DEX:
-| Вид | Комиссия |
+| Échange de jetons | Les utilisateurs peuvent échanger des jetons entre eux |
+| Ordres à cours limité | Définir prix et volume |
+| Ordres au marché | Achat/vente instantané au prix du marché |
+| Graphiques et analyses | Visualiser la dynamique des prix |
+| Staking de jetons | Protection contre la volatilité et croissance de la valeur |
+| Pools de liquidité | Participer à des pools pour gagner des frais |
+| Gouvernance DAO | Voter sur le développement de l’entreprise et de la plateforme |
+### 💰 Monétisation du DEX :
+| Type | Frais |
 |-----|----------|
-| Покупка токенов | 0.5–1% |
-| Перепродажа токенов | 0.1–0.5% |
-| Премиум-листинг | $500–$1000 за вывод |
-| Аналитика | $10–$50 в мес. |
-| Партнёрская программа | 2–5% за реферала |
-
+| Achat de jetons | 0,5–1 % |
+| Revente de jetons | 0,1–0,5 % |
+| Listing premium | 500–1000 $ par listing |
+| Analytique | 10–50 $ par mois |
+| Programme affilié | 2–5 % par parrain |
 ---
-
-## 🌍 Поддержка глобальных API для проверки бизнеса
-
-| Страна | Идентификатор | API |
+## 🌍 Prise en charge des API mondiales de vérification des entreprises
+| Pays | Identifiant | API |
 |--------|----------------|-----|
-| Россия | ИНН            | Checko |
-| США    | EIN            | Dun & Bradstreet |
-| ЕС     | VAT ID         | VIES |
+| Russie | INN            | Checko |
+| États-Unis | EIN            | Dun & Bradstreet |
+| UE     | VAT ID         | VIES |
 | Global | Company ID     | OpenCorporates |
-
 ---
-
-## 💸 Мультивалютность
-
-| Поддерживаемые валюты | Описание |
+## 💸 Prise en charge multi-devises
+| Devises prises en charge | Description |
 |------------------------|----------|
-| RUB                    | Российский рубль |
-| USD                    | Доллар США |
-| EUR                    | Евро |
-| USDT                   | Стейблкоин (TRC20, ERC20) |
-| USDC                   | Стейблкоин (ERC20) |
+| RUB                    | Rouble russe |
+| USD                    | Dollar américain |
+| EUR                    | Euro |
+| USDT                   | Stablecoin (TRC20, ERC20) |
+| USDC                   | Stablecoin (ERC20) |
 | ETH                    | Ethereum |
 | BTC                    | Bitcoin |
-
 ---
-
-## 📅 Текущий статус и план запуска
-
-### ✅ Прототип:
-- Работает на Checko API (российские компании)
-- Поддерживает регистрацию, выпуск и покупку токенов
-- Реализовано распределение дивидендов
-- Полностью функциональный Telegram-бот
-
-### 🚀 Возможности запуска:
-- **Бета-версия** может быть запущена в течение **1 месяца**
-- Платформа готова к первым транзакциям
-- Можно развернуть на тестовой группе компаний и пользователей
-
+## 📅 Statut actuel et plan de lancement
+### ✅ Prototype :
+- Fonctionnel avec l’API Checko (entreprises russes)
+- Prend en charge l’enregistrement, l’émission et l’achat de jetons
+- Distribution des dividendes implémentée
+- Bot Telegram entièrement fonctionnel
+### 🚀 Opportunités de lancement :
+- Une **version bêta** peut être lancée en **1 mois**
+- La plateforme est prête pour les premières transactions
+- Peut être déployée avec un groupe test d’entreprises et d’utilisateurs
 ---

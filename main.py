@@ -1,5 +1,5 @@
 """
-TokenizeLocal Console App - зеркальная версия Telegram-бота
+TokenizeLocal Console App - Version miroir du bot Telegram
 """
 
 import os
@@ -8,112 +8,112 @@ from blockchain.users import UserManager, UserAlreadyExists, InvalidEmail
 from verification.api_client import FinancialAPIClient
 from utils.logger import Logger
 
-# Инициализация
+# Initialisation
 logger = Logger("TokenizeLocalConsole")
-checko_api_key = "yCEWUepinagwBCn3"  # или загрузите из .env
+checko_api_key = "yCEWUepinagwBCn3"  # ou charger depuis .env
 db = DBManager()
 user_manager = UserManager()
 
 def show_help():
     print("""
-🔍 Доступные команды:
-1. Войти как пользователь
-2. Зарегистрироваться как пользователь
-3. Войти как компания
-4. Выпустить токены
-5. Список компаний
-6. Купить токены
-7. Мой баланс
-8. Помощь
-9. Выход
+🔍 Commandes disponibles:
+1. Se connecter en tant qu'utilisateur
+2. S'inscrire comme utilisateur
+3. Mode entreprise
+4. Émettre des tokens
+5. Liste des entreprises
+6. Acheter des tokens
+7. Mon solde
+8. Aide
+9. Quitter
     """)
 
 def login_user():
-    print("\n🔐 Вход как пользователь")
-    email = input("Введите email: ").strip()
-    password = input("Введите пароль: ").strip()
+    print("\n🔐 Connexion utilisateur")
+    email = input("Email: ").strip()
+    password = input("Mot de passe: ").strip()
 
     if user_manager.authenticate_user(email, password):
-        print(f"[INFO] Вход выполнен успешно для {email}")
+        print(f"[INFO] Connexion réussie pour {email}")
         return email
     else:
-        print("[ERROR] Неверный email или пароль.")
+        print("[ERREUR] Email ou mot de passe incorrect.")
         return None
 
 def register_user():
-    print("\n📝 Регистрация нового пользователя")
-    name = input("Имя: ").strip()
+    print("\n📝 Inscription d'un nouvel utilisateur")
+    name = input("Nom: ").strip()
     email = input("Email: ").strip()
-    password = input("Пароль: ").strip()
+    password = input("Mot de passe: ").strip()
 
     try:
         user_manager.register_user(name, email, password)
-        print(f"[INFO] Регистрация успешна! Добро пожаловать, {name}!")
+        print(f"[INFO] Inscription réussie! Bienvenue, {name}!")
         return email
     except UserAlreadyExists:
-        print("[ERROR] Пользователь с таким email уже существует.")
+        print("[ERREUR] Un utilisateur avec cet email existe déjà.")
     except InvalidEmail:
-        print("[ERROR] Некорректный email.")
+        print("[ERREUR] Email invalide.")
     except Exception as e:
-        print(f"[ERROR] Ошибка регистрации: {e}")
+        print(f"[ERREUR] Erreur d'inscription: {e}")
     return None
 
 def company_mode():
-    print("\n🏢 Режим компании")
-    inn = input("Введите ИНН компании: ").strip()
+    print("\n🏢 Mode entreprise")
+    inn = input("Entrez le numéro INN de l'entreprise: ").strip()
 
     if len(inn) not in (10, 12) or not inn.isdigit():
-        print("[ERROR] Неверный формат ИНН. Должно быть 10 или 12 цифр.")
+        print("[ERREUR] Format INN invalide. Doit contenir 10 ou 12 chiffres.")
         return
 
     try:
         api_client = FinancialAPIClient(checko_api_key)
         company_info = api_client.get_company_info(inn)
-        print(f"[INFO] Компания найдена: {company_info['name']}")
-        print(f"Статус: {company_info['status']}")
+        print(f"[INFO] Entreprise trouvée: {company_info['name']}")
+        print(f"Statut: {company_info['status']}")
 
-        amount_input = input("Сколько токенов выпустить? ")
+        amount_input = input("Nombre de tokens à émettre: ")
         amount = float(amount_input)
         if amount <= 0:
-            raise ValueError("Количество должно быть положительным.")
+            raise ValueError("Le nombre doit être positif.")
 
         db.register_or_update_business(inn, company_info["name"])
         db.issue_tokens(inn, amount)
-        print(f"[INFO] Выпущено {amount} токенов для компании '{company_info['name']}'")
+        print(f"[INFO] {amount} tokens émis pour l'entreprise '{company_info['name']}'")
 
     except Exception as e:
-        print(f"[ERROR] Ошибка выпуска токенов: {e}")
+        print(f"[ERREUR] Erreur d'émission de tokens: {e}")
 
 def show_companies():
-    print("\n📋 Доступные компании:")
+    print("\n📋 Entreprises disponibles:")
     companies = db.get_all_issuances()
     if not companies:
-        print("Нет доступных компаний.")
+        print("Aucune entreprise disponible.")
         return
 
     for idx, (inn, name, amount, _) in enumerate(companies):
-        print(f"{idx+1}. {name} (ИНН: {inn}) — доступно токенов: {amount or 0}")
+        print(f"{idx+1}. {name} (INN: {inn}) — tokens disponibles: {amount or 0}")
 
 def buy_tokens(email):
-    print("\n🛒 Покупка токенов")
+    print("\n🛒 Achat de tokens")
     show_companies()
-    choice = input("Выберите номер компании: ").strip()
-    amount_input = input("Сколько токенов хотите купить? ").strip()
+    choice = input("Choisissez le numéro d'entreprise: ").strip()
+    amount_input = input("Nombre de tokens à acheter: ").strip()
 
     try:
         company_num = int(choice)
         amount = float(amount_input)
 
         if company_num <= 0 or amount <= 0:
-            raise ValueError("Числа должны быть положительными")
+            raise ValueError("Les nombres doivent être positifs")
 
         companies = db.get_all_issuances()
         if company_num > len(companies):
-            raise ValueError("Компании с таким номером не существует")
+            raise ValueError("Cette entreprise n'existe pas")
 
         inn, name, available, _ = companies[company_num - 1]
         if available is None or amount > available:
-            raise ValueError(f"Недостаточно токенов. Доступно: {available or 0}")
+            raise ValueError(f"Tokens insuffisants. Disponible: {available or 0}")
 
         db.issue_tokens(inn, -amount)
         db.add_user_tokens(email=email, business_inn=inn, amount=amount)
@@ -121,31 +121,31 @@ def buy_tokens(email):
         user_tokens = db.get_user_tokens(email)
         current_amount = next((t[2] for t in user_tokens if t[0] == inn), 0)
 
-        print(f"\n✅ Успешно куплено {amount} токенов компании '{name}'")
-        print(f"Ваш текущий баланс: {current_amount}")
+        print(f"\n✅ Achat réussi de {amount} tokens de '{name}'")
+        print(f"Votre solde actuel: {current_amount}")
     except ValueError as e:
-        print(f"[ERROR] Ошибка ввода: {e}")
+        print(f"[ERREUR] Erreur de saisie: {e}")
     except Exception as e:
-        print(f"[ERROR] Неожиданная ошибка: {e}")
+        print(f"[ERREUR] Erreur inattendue: {e}")
 
 def show_balance(email):
-    print("\n💰 Ваш баланс:")
+    print("\n💰 Votre solde:")
     tokens = db.get_user_tokens(email)
     if not tokens:
-        print("У вас пока нет токенов.")
+        print("Vous n'avez pas encore de tokens.")
         return
     for row in tokens:
         inn, name, token_count = row
-        print(f"- {name}: {token_count} токенов")
+        print(f"- {name}: {token_count} tokens")
 
 def run_full_demo():
-    print("=== TokenizeLocal Console App ===")
+    print("=== Application Console TokenizeLocal ===")
     email = None
     role = None
 
     while True:
         show_help()
-        choice = input("Выберите действие (1-9): ").strip()
+        choice = input("Choisissez une action (1-9): ").strip()
 
         if choice == "1":
             email = login_user()
@@ -159,26 +159,26 @@ def run_full_demo():
             if role == "company":
                 company_mode()
             else:
-                print("[ERROR] Выберите роль компании.")
+                print("[ERREUR] Sélectionnez le mode entreprise.")
         elif choice == "5":
             show_companies()
         elif choice == "6":
             if role == "user" and email:
                 buy_tokens(email)
             else:
-                print("[ERROR] Сначала войдите как пользователь.")
+                print("[ERREUR] Connectez-vous d'abord comme utilisateur.")
         elif choice == "7":
             if role == "user" and email:
                 show_balance(email)
             else:
-                print("[ERROR] Сначала войдите как пользователь.")
+                print("[ERREUR] Connectez-vous d'abord comme utilisateur.")
         elif choice == "8":
             show_help()
         elif choice == "9":
-            print("Выход...")
+            print("Déconnexion...")
             break
         else:
-            print("[ERROR] Неверный выбор.")
+            print("[ERREUR] Choix invalide.")
 
 if __name__ == "__main__":
     run_full_demo()

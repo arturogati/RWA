@@ -1,240 +1,240 @@
 
----
-
-# 📊 **TokenizeLocal — Бизнес-модель и Финансы**
 
 ---
 
-## 🧩 **1. Бизнес-модель**
+# 📊 **TokenizeLocal — Modèle économique et Finance**
 
-TokenizeLocal предлагает платформу, которая позволяет малому и среднему бизнесу привлекать инвестиции через **токенизацию долей в выручке**. Инвесторы покупают токены, которые дают право на **ежемесячные дивиденды** и **потенциальный рост стоимости** в зависимости от успеха бизнеса.
+---
 
-### 🔁 **Основные элементы бизнес-модели:**
+## 🧩 **1. Modèle économique**
 
-| Элемент | Описание |
+TokenizeLocal propose une plateforme permettant aux petites et moyennes entreprises d’attirer des investissements via la **tokenisation de parts de chiffre d’affaires**. Les investisseurs achètent des jetons qui leur donnent droit à des **dividendes mensuels** et à une **potentielle appréciation de leur valeur**, selon la performance de l’entreprise.
+
+### 🔁 **Éléments clés du modèle économique :**
+
+| Élément | Description |
 |--------|----------|
-| **Value Proposition** | Бизнес получает инвестиции, инвестор — пассивный доход и возможность выйти через вторичный рынок. |
-| **Customer Segments** | Малый бизнес (кафе, магазины, вендинг), инвесторы, RWA-фонды, DAO-сообщества |
-| **Channels** | Telegram-бот, веб-интерфейс, партнёрские платформы |
-| **Customer Relationships** | Поддержка через Telegram, автоматические уведомления о дивидендах |
-| **Revenue Streams** | Комиссии за выпуск, покупку и перепродажу токенов |
-| **Key Resources** | API-интеграции, система распределения дивидендов, пользовательская база данных |
-| **Key Activities** | Проверка бизнеса, распределение дивидендов, поддержка ликвидности |
-| **Key Partners** | Checko API, OpenCorporates, блокчейн-сети (Polygon, TON), DAO-платформы |
-| **Cost Structure** | API-запросы, серверные расходы, разработка, маркетинг, юридические издержки |
+| **Value Proposition** | L’entreprise obtient un financement, l’investisseur reçoit un revenu passif et la possibilité de sortir via un marché secondaire. |
+| **Customer Segments** | PME (cafés, boutiques, distributeurs automatiques), investisseurs, fonds RWA, communautés DAO |
+| **Channels** | Bot Telegram, interface web, plateformes partenaires |
+| **Customer Relationships** | Support via Telegram, notifications automatiques de dividendes |
+| **Revenue Streams** | Commissions sur l’émission, l’achat et la revente de jetons |
+| **Key Resources** | Intégrations API, système de distribution des dividendes, base de données utilisateurs |
+| **Key Activities** | Vérification des entreprises, distribution des dividendes, soutien à la liquidité |
+| **Key Partners** | API Checko, OpenCorporates, réseaux blockchain (Polygon, TON), plateformes DAO |
+| **Cost Structure** | Requêtes API, coûts serveur, développement, marketing, frais juridiques |
 
 ---
 
-## 💰 **2. Механизм монетизации**
+## 💰 **2. Mécanisme de monétisation**
 
-### 📈 **Доходы платформы:**
+### 📈 **Revenus de la plateforme :**
 
-| Источник дохода | Описание | Комиссия |
+| Source de revenus | Description | Commission |
 |------------------|----------|----------|
-| **Выпуск токенов** | Бизнес платит за выпуск токенов | 3–5% от собранной суммы |
-| **Покупка токенов** | Комиссия за инвестирование | 0.5–1% |
-| **Перепродажа токенов** | Комиссия на вторичном рынке | 0.1–0.5% |
-| **Премиум-листинг** | Выделение бизнеса в каталоге | $500–$1000 за вывод |
-| **Аналитика** | Доступ к отчётам по бизнесу | $10–$50 в мес. |
-| **Партнёрская программа** | Привлечение новых участников | 2–5% за реферала |
+| **Émission de jetons** | L’entreprise paie pour l’émission des jetons | 3–5 % du montant levé |
+| **Achat de jetons** | Commission sur l’investissement | 0,5–1 % |
+| **Revente de jetons** | Commission sur le marché secondaire | 0,1–0,5 % |
+| **Listing premium** | Mise en avant de l’entreprise dans le catalogue | 500–1 000 $ par mise en avant |
+| **Analytique** | Accès aux rapports sur l’entreprise | 10–50 $ par mois |
+| **Programme d’affiliation** | Recrutement de nouveaux participants | 2–5 % par parrainage |
 
 ---
 
-## 📊 **3. Пример финансовой модели для бизнеса**
+## 📊 **3. Exemple de modèle financier pour une entreprise**
 
-### Предположим:
-- Бизнес выпускает **10 000 токенов**.
-- Цена токена: **$0.1**
-- Общая сумма сбора: **$1000**
-- Дивидендная доля: **10% от выручки**
-- Ежемесячная выручка: **$10 000**
+### Supposons :
+- L’entreprise émet **10 000 jetons**.
+- Prix du jeton : **0,10 $**
+- Montant total levé : **1 000 $**
+- Part des dividendes : **10 % du chiffre d’affaires**
+- Chiffre d’affaires mensuel : **10 000 $**
 
-### 📥 **Доход бизнеса:**
-- Сбор от токенов: **$1000**
-- Комиссия платформы: **$50**
-- Чистый доход: **$950**
+### 📥 **Revenus de l’entreprise :**
+- Montant levé via les jetons : **1 000 $**
+- Commission de la plateforme : **50 $**
+- Revenu net : **950 $**
 
-### 📤 **Выплаты инвесторам:**
-- Ежемесячный дивидендный пул: **$1000 × 10% = $100**
-- Ежемесячный доход инвестора (1000 токенов): **$10**
+### 📤 **Paiements aux investisseurs :**
+- Pools de dividendes mensuel : **10 000 $ × 10 % = 1 000 $**
+- Revenu mensuel pour un investisseur (1 000 jetons) : **100 $**
 
 ---
 
-## 📈 **4. ROI для инвестора**
+## 📈 **4. ROI pour un investisseur**
 
-| Параметр | Значение |
+| Paramètre | Valeur |
 |----------|----------|
-| Куплено токенов | 1000 |
-| Цена токена | $0.1 |
-| Общая сумма | $100 |
-| Ежемесячные дивиденды | $10 |
-| Время владения | 12 месяцев |
-| Итого дивидендов | $120 |
-| Цена токена через год | $0.20 |
-| Выручка от продажи | $200 |
-| Общий ROI | **220% за год** |
+| Jetons achetés | 1 000 |
+| Prix du jeton | 0,10 $ |
+| Montant total | 100 $ |
+| Dividendes mensuels | 10 $ |
+| Durée de détention | 12 mois |
+| Dividendes totaux | 120 $ |
+| Prix du jeton après 1 an | 0,20 $ |
+| Recette de vente | 200 $ |
+| ROI total | **220 % sur un an** |
 
 ---
 
-## 📊 **5. Пример роста бизнеса и токена**
+## 📊 **5. Exemple de croissance de l’entreprise et du jeton**
 
-| Месяц | Выручка | % дивидендов | Цена токена |
+| Mois | Chiffre d’affaires | % dividendes | Prix du jeton |
 |-------|--------|--------------|-------------|
-| 1     | $10 000 | 10%          | $0.10       |
-| 3     | $12 000 | 10%          | $0.12       |
-| 6     | $15 000 | 10%          | $0.15       |
-| 9     | $18 000 | 10%          | $0.18       |
-| 12    | $20 000 | 10%          | $0.20       |
+| 1     | 10 000 $ | 10 %          | 0,10 $       |
+| 3     | 12 000 $ | 10 %          | 0,12 $       |
+| 6     | 15 000 $ | 10 %          | 0,15 $       |
+| 9     | 18 000 $ | 10 %          | 0,18 $       |
+| 12    | 20 000 $ | 10 %          | 0,20 $       |
 
-👉 Цена токена выросла на **100% за год**.  
-👉 Дивиденды принесли $1 200.  
-👉 Общий ROI: **220% за год**.
+👉 Le prix du jeton a augmenté de **100 % sur un an**.  
+👉 Les dividendes ont généré 1 200 $.  
+👉 ROI total : **220 % sur un an**.
 
 ---
 
-## 📈 **6. Прогноз масштабирования**
+## 📈 **6. Prévision de croissance**
 
-| Период | Бизнесы | Инвесторы | Доход |
+| Période | Entreprises | Investisseurs | Revenus |
 |--------|----------|-----------|--------|
-| Год 1 | 100      | 10 000    | $1 млн+ |
-| Год 2 | 1000     | 100 000   | $10 млн+ |
-| Год 3 | 10 000   | 1 млн+     | $100 млн+ |
+| Année 1 | 100      | 10 000    | 1 M$+ |
+| Année 2 | 1 000    | 100 000   | 10 M$+ |
+| Année 3 | 10 000   | 1 M+      | 100 M$+ |
 
 ---
 
-## 📦 **7. Монетизация DEX (вторичный рынок)**
+## 📦 **7. Monétisation DEX (marché secondaire)**
 
-| Вид | Комиссия |
+| Type | Commission |
 |-----|----------|
-| Покупка токенов | 0.5–1% |
-| Перепродажа токенов | 0.1–0.5% |
-| Премиум-листинг | $500–$1000 за вывод |
-| Аналитика | $10–$50 в мес. |
-| Партнёрская программа | 2–5% за реферала |
+| Achat de jetons | 0,5–1 % |
+| Revente de jetons | 0,1–0,5 % |
+| Listing premium | 500–1 000 $ par mise en avant |
+| Analytique | 10–50 $ par mois |
+| Programme d’affiliation | 2–5 % par parrainage |
 
 ---
 
-## 🌍 **8. Поддержка международных бизнесов**
+## 🌍 **8. Support des entreprises internationales**
 
-| Регион | API | Идентификатор |
+| Région | API | Identifiant |
 |--------|-----|----------------|
-| Россия | Checko API | ИНН |
-| США    | Dun & Bradstreet | EIN |
-| ЕС     | VIES | VAT ID |
+| Russie | Checko API | INN |
+| États-Unis | Dun & Bradstreet | EIN |
+| UE     | VIES | VAT ID |
 | Global | OpenCorporates | Company ID |
 
 ---
 
-## 💸 **9. Мультивалютность**
+## 💸 **9. Multi-devises**
 
-| Валюта | Описание |
+| Devise | Description |
 |--------|----------|
-| RUB    | Российский рубль |
-| USD    | Доллар США |
-| EUR    | Евро |
-| USDT   | Стейблкоин (TRC20, ERC20) |
-| USDC   | Стейблкоин (ERC20) |
+| RUB    | Rouble russe |
+| USD    | Dollar américain |
+| EUR    | Euro |
+| USDT   | Stablecoin (TRC20, ERC20) |
+| USDC   | Stablecoin (ERC20) |
 | ETH    | Ethereum |
 | BTC    | Bitcoin |
 
 ---
 
-## 🧠 **10. Уникальное предложение**
+## 🧠 **10. Proposition de valeur unique**
 
-| Что делаем | Чем отличаемся |
+| Ce que nous faisons | Ce qui nous distingue |
 |-----------|----------------|
-| Токенизация бизнеса | Не только крупные активы, но и кафе, вендинг, Solar Energy |
-| Централизованная модель | Быстрый запуск, дешево |
-| Выплата дивидендов | Пропорционально токенам |
-| Готов к блокчейну | Можно перейти на Polygon / TON |
-| Удобство для инвестора | Просмотр своих токенов и дивидендов |
+| Tokenisation d’entreprise | Pas seulement des grands actifs, mais aussi cafés, distributeurs, énergie solaire |
+| Modèle centralisé | Lancement rapide, peu coûteux |
+| Paiement de dividendes | Proportionnel au nombre de jetons détenus |
+| Prêt pour la blockchain | Possibilité de migration vers Polygon / TON |
+| Convivialité pour l’investisseur | Visualisation claire des jetons et dividendes |
 
 ---
 
-## 🚀 **11. План масштабирования**
+## 🚀 **11. Plan de croissance**
 
-| Шаг | Что делать |
+| Étape | À faire |
 |-----|------------|
-| CLI MVP | Полностью рабочий |
-| Web-версия | FastAPI / Flask + React |
-| Вторичный рынок | DEX поверх токенов |
-| Блокчейн | Выпуск через смарт-контракты |
-| DAO | Голосование за развитие бизнеса |
-| Global Market | Поддержка разных стран |
+| CLI MVP | Entièrement opérationnel |
+| Version web | FastAPI / Flask + React |
+| Marché secondaire | DEX basé sur les jetons |
+| Blockchain | Émission via contrats intelligents |
+| DAO | Vote sur le développement de l’entreprise |
+| Marché mondial | Support de plusieurs pays |
 
 ---
 
-## 📈 **12. Пример финансового потока**
+## 📈 **12. Exemple de flux financier**
 
-Бизнес регистрируется, выпускает токены, собирает $10 000.  
-Инвестор A покупает 1000 токенов, B — 2000, C — 7000.  
-Ежемесячно все получают выплаты из пула дивидендов.  
-Если бизнес растёт, токены дорожают, и инвесторы могут выгодно их продать.
-
----
-
-## 📌 **13. Почему это интересно инвестору?**
-
-- ✔️ **RWA становится одним из самых быстрорастущих направлений DeFi**
-- ✔️ **Малый бизнес — огромный, недооцененный рынок**
-- ✔️ **Автоматическое распределение прибыли — высокая ликвидность**
-- ✔️ **Можно начать с России, потом масштабироваться на весь мир**
+L’entreprise s’inscrit, émet des jetons et lève 10 000 $.  
+L’investisseur A achète 1 000 jetons, B en achète 2 000, C en achète 7 000.  
+Chaque mois, tous reçoivent des paiements depuis le pool de dividendes.  
+Si l’entreprise croît, la valeur des jetons augmente, permettant aux investisseurs de les revendre avec profit.
 
 ---
 
-## 🧠 **14. Конкурентные преимущества**
+## 📌 **13. Pourquoi cela intéresse-t-il l’investisseur ?**
 
-| Преимущество | Реализация |
+- ✔️ **Les RWA deviennent l’un des secteurs les plus dynamiques de la DeFi**
+- ✔️ **Les PME représentent un marché énorme et sous-évalué**
+- ✔️ **La répartition automatique des bénéfices assure une forte liquidité**
+- ✔️ **Possibilité de démarrer en Russie, puis de s’étendre au monde entier**
+
+---
+
+## 🧠 **14. Avantages concurrentiels**
+
+| Avantage | Mise en œuvre |
 |-------------|------------|
-| Прозрачность | Все данные видны в БД |
-| Автоматические дивиденды | Выплаты ежемесячно |
-| Централизованная модель | Быстрый запуск, низкие затраты |
-| Поддержка регуляций | Выпуск через SPV в юрисдикциях с clear compliance |
-| Гибкость модели | Можно адаптировать под любую нишу |
-| Глобальный доступ | Поддержка USDT, USDC, ETH |
+| Transparence | Toutes les données visibles dans la base de données |
+| Dividendes automatiques | Paiements mensuels |
+| Modèle centralisé | Lancement rapide, coûts faibles |
+| Conformité réglementaire | Émission via SPV dans des juridictions conformes |
+| Flexibilité du modèle | Adaptable à n’importe quel créneau |
+| Accès mondial | Support de USDT, USDC, ETH |
 
 ---
 
-## 📈 **15. Пример: развитие бизнеса и рост цены токена**
+## 📈 **15. Exemple : développement de l’entreprise et hausse du prix du jeton**
 
-| Месяц | Выручка | % дивидендов | Цена токена |
+| Mois | Chiffre d’affaires | % dividendes | Prix du jeton |
 |-------|--------|--------------|-------------|
-| 1     | $10 000 | 10%          | $0.10       |
-| 3     | $12 000 | 10%          | $0.12       |
-| 6     | $15 000 | 10%          | $0.15       |
-| 9     | $18 000 | 10%          | $0.18       |
-| 12    | $20 000 | 10%          | $0.20       |
+| 1     | 10 000 $ | 10 %          | 0,10 $       |
+| 3     | 12 000 $ | 10 %          | 0,12 $       |
+| 6     | 15 000 $ | 10 %          | 0,15 $       |
+| 9     | 18 000 $ | 10 %          | 0,18 $       |
+| 12    | 20 000 $ | 10 %          | 0,20 $       |
 
-👉 Токен вырос в цене на 100%, а дивиденды обеспечили стабильный доход.
+👉 Le jeton a augmenté de 100 % en valeur, et les dividendes ont assuré un revenu stable.
 
 ---
 
-## 📊 **16. Пример ROI для инвестора**
+## 📊 **16. Exemple de ROI pour un investisseur**
 
-| Параметр | Значение |
+| Paramètre | Valeur |
 |----------|----------|
-| Куплено токенов | 1000 |
-| Цена токена | $0.1 |
-| Общая сумма | $100 |
-| Ежемесячные дивиденды | $10 |
-| Время владения | 12 месяцев |
-| Итого дивидендов | $120 |
-| Цена токена через год | $0.20 |
-| Выручка от продажи | $200 |
-| Общий ROI | **220% за год** |
+| Jetons achetés | 1 000 |
+| Prix du jeton | 0,10 $ |
+| Montant total | 100 $ |
+| Dividendes mensuels | 10 $ |
+| Durée de détention | 12 mois |
+| Dividendes totaux | 120 $ |
+| Prix du jeton après 1 an | 0,20 $ |
+| Recette de vente | 200 $ |
+| ROI total | **220 % sur un an** |
 
 ---
 
-## ✅ **17. Причины инвестировать**
+## ✅ **17. Raisons d’investir**
 
-| Причина | Описание |
+| Raison | Description |
 |--------|----------|
-| 📈 Высокий ROI | 10–20% в месяц на начальном этапе |
-| 🌍 Глобальный рынок | Поддержка международных бизнесов |
-| 🧩 Технологичность | Блокчейн, смарт-контракты, DEX |
-| 💡 Новаторский подход | Токенизация малого бизнеса — новое направление |
-| 🧠 Прозрачность | Все данные открыты и проверяемы |
-| 📊 Масштабируемость | От MVP до децентрализованной экосистемы |
+| 📈 ROI élevé | 10–20 % par mois en phase initiale |
+| 🌍 Marché mondial | Support des entreprises internationales |
+| 🧩 Technologie avancée | Blockchain, contrats intelligents, DEX |
+| 💡 Approche innovante | Tokenisation des petites entreprises — un nouveau domaine |
+| 🧠 Transparence | Toutes les données sont ouvertes et vérifiables |
+| 📊 Évolutivité | De l’MVP à un écosystème décentralisé |
 
 ---
-
