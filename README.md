@@ -83,8 +83,7 @@
 
 #### 4.1. Поток данных
 
-```mermaid
-graph TD
+
     main[main.py] --> role{Роль: user / company?}
     role -- user --> auth[Авторизация через UserManager]
     auth --> companies[Список компаний из get_all_issuances()]
@@ -95,7 +94,7 @@ graph TD
     checko --> issue[Выпуск токенов через issue_tokens()]
     issue --> update[Ежемесячное обновление выручки]
     update --> dividends[distribute_dividends() → выплата дивидендов]
-```
+
 
 ---
 
