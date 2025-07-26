@@ -1,5 +1,5 @@
 """
-TokenizeLocal Telegram Bot — финальная версия с дивидендами
+TokenizeLocal Telegram Bot — финальная версия
 """
 
 import os
@@ -18,67 +18,105 @@ from blockchain.users import UserManager, UserAlreadyExists, InvalidEmail
 from verification.api_client import FinancialAPIClient
 from utils.logger import Logger
 
+# Логгер
 logger = Logger("TokenizeLocalBot")
+
+# Токены
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "8184934106:AAElcn4Y28rFjvUOeg83XHxKgJzOoptpvjI")
 CHECKO_API_KEY = os.getenv("CHECKO_API_KEY", "yCEWUepinagwBCn3")
+
 
 class TelegramBotHandler:
     def __init__(self):
         self.checko_api_key = CHECKO_API_KEY
         self.user_states = {}
-        self.commands_help = (
-            "🔍 Доступные команды:\n"
-            "/start - Начало\n"
-            "/register - Регистрация\n"
-            "/login - Вход\n"
-            "/issue_tokens - Выпуск токенов\n"
-            "/companies - Список компаний\n"
-            "/buy - Покупка токенов\n"
-            "/balance - Мой баланс\n"
-            "/dividends - Мои выплаты\n"
-            "/help - Помощь"
-        )
 
     def get_user_state(self, user_id: int) -> Dict:
         if user_id not in self.user_states:
             self.user_states[user_id] = {"role": None, "data": {}, "help_shown": False}
         return self.user_states[user_id]
 
-    async def show_help_once(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        user_id = update.effective_user.id
-        user_state = self.get_user_state(user_id)
-        if not user_state["help_shown"]:
-            await context.bot.send_message(chat_id=update.effective_chat.id, text=self.commands_help)
-            user_state["help_shown"] = True
+    def get_help_text(self, role: str) -> str:
+        """Возвращает подсказку в зависимости от роли"""
+        if role == "company":
+            return (
+                "💼 Вы в режиме компании.\n\n"
+                "Доступные команды:\n"
+                "/issue_tokens — Выпустить токены\n"
+                "/help — Помощь\n\n"
+                "💡 Чтобы начать сначала — введите /start"
+            )
+        else:
+            return (
+                "👤 Вы в режиме пользователя.\n\n"
+                "Доступные команды:\n"
+                "/register — Регистрация\n"
+                "/login — Вход\n"
+                "/companies — Список компаний\n"
+                "/buy — Покупка токенов\n"
+                "/balance — Мой баланс\n"
+                "/dividends — Мои выплаты\n"
+                "/help — Помощь\n\n"
+                "💡 Чтобы начать сначала — введите /start"
+            )
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        keyboard = [[InlineKeyboardButton("👤 Пользователь", callback_data="role_user")],
-                    [InlineKeyboardButton("🏢 Компания", callback_data="role_company")]]
+        """Обработка /start — выбор роли"""
+        keyboard = [
+            [InlineKeyboardButton("👤 Пользователь", callback_data="role_user")],
+            [InlineKeyboardButton("🏢 Компания", callback_data="role_company")]
+        ]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text("Добро пожаловать!\nВыберите роль:", reply_markup=reply_markup)
-        await self.show_help_once(update, context)
+        await update.message.reply_text(
+            "Добро пожаловать в TokenizeLocal!\n"
+            "Выберите вашу роль:",
+            reply_markup=reply_markup
+        )
+
+        user_id = update.effective_user.id
+        user_state = self.get_user_state(user_id)
+        user_state["role"] = None
+        user_state["help_shown"] = False
 
     async def help_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        await update.message.reply_text(self.commands_help)
+        """Обработчик /help — показывает актуальную подсказку"""
+        user_id = update.effective_user.id
+        user_state = self.get_user_state(user_id)
+        role = user_state.get("role", "user")
+        help_text = self.get_help_text(role)
+        await update.message.reply_text(help_text, parse_mode=None)
 
     async def handle_role_selection(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """Обработка выбора роли"""
         query = update.callback_query
         await query.answer()
         user_id = query.from_user.id
         user_state = self.get_user_state(user_id)
+
         if query.data == "role_user":
             user_state["role"] = "user"
-            await query.edit_message_text("Вы выбрали режим пользователя.")
+            await query.edit_message_text("✅ Вы выбрали режим пользователя.")
         elif query.data == "role_company":
             user_state["role"] = "company"
-            await query.edit_message_text("Вы выбрали режим компании.")
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=self.commands_help)
+            await query.edit_message_text("✅ Вы выбрали режим компании.")
+        else:
+            await query.edit_message_text("❌ Неизвестная роль.")
+            return
+
+        # ✅ Всегда отправляем подсказку
+        help_text = self.get_help_text(user_state["role"])
+        await context.bot.send_message(
+            chat_id=update.effective_chat.id,
+            text=help_text,
+            parse_mode=None  # 🔥 Ключевое: убран Markdown
+        )
+        user_state["help_shown"] = True
 
     async def register_user(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_id = update.effective_user.id
         user_state = self.get_user_state(user_id)
         if user_state["role"] != "user":
-            await update.message.reply_text("Выберите роль пользователя через /start")
+            await update.message.reply_text("❌ Эта команда только для пользователей.")
             return
         await update.message.reply_text("Введите имя, email и пароль через пробел\nПример: Иван user@example.com 1234")
         user_state["awaiting_register"] = True
@@ -87,7 +125,7 @@ class TelegramBotHandler:
         user_id = update.effective_user.id
         user_state = self.get_user_state(user_id)
         if user_state["role"] != "user":
-            await update.message.reply_text("Выберите роль пользователя через /start")
+            await update.message.reply_text("❌ Эта команда только для пользователей.")
             return
         await update.message.reply_text("Введите email и пароль через пробел")
         user_state["awaiting_login"] = True
@@ -96,7 +134,7 @@ class TelegramBotHandler:
         user_id = update.effective_user.id
         user_state = self.get_user_state(user_id)
         if user_state["role"] != "company":
-            await update.message.reply_text("Выберите роль компании через /start")
+            await update.message.reply_text("❌ Эта команда только для компаний.")
             return
         await update.message.reply_text("Введите ИНН компании (10 или 12 цифр):")
         user_state["awaiting_inn"] = True
@@ -107,14 +145,10 @@ class TelegramBotHandler:
         inn = update.message.text.strip()
         if not (len(inn) in (10, 12) and inn.isdigit()):
             await update.message.reply_text("❌ Неверный формат ИНН.")
-            user_state.pop("awaiting_inn", None)
             return
         try:
             api_client = FinancialAPIClient(self.checko_api_key)
             company_info = api_client.get_company_info(inn)
-            if company_info.get("status") != "Действует":
-                await update.message.reply_text(f"❌ Компания не действует: {company_info['status']}")
-                return
             user_state["company_data"] = {"inn": inn, "name": company_info["name"]}
             await update.message.reply_text(f"✅ {company_info['name']}\nТеперь введите количество токенов:")
             user_state["awaiting_token_amount"] = True
@@ -138,8 +172,6 @@ class TelegramBotHandler:
             db.register_or_update_business(company_data["inn"], company_data["name"])
             db.issue_tokens(company_data["inn"], amount)
             await update.message.reply_text(f"✅ Выпущено {amount} токенов для {company_data['name']}!")
-        except ValueError as e:
-            await update.message.reply_text(f"❌ Ошибка: {str(e)}")
         except Exception as e:
             await update.message.reply_text(f"❌ Ошибка: {str(e)}")
         finally:
@@ -174,12 +206,12 @@ class TelegramBotHandler:
         user_id = update.effective_user.id
         user_state = self.get_user_state(user_id)
         if user_state["role"] != "user":
-            await update.message.reply_text("Только для пользователей")
+            await update.message.reply_text("❌ Эта команда только для пользователей.")
             return
         db = DBManager()
         companies = db.get_all_issuances()
         if not companies:
-            await update.message.reply_text("Нет компаний.")
+            await update.message.reply_text("❌ Нет компаний.")
             return
         response = "Выберите компанию:\n"
         for idx, (inn, name, amount, _) in enumerate(companies):
@@ -265,6 +297,7 @@ class TelegramBotHandler:
                     await update.message.reply_text("❌ Некорректный email.")
                 finally:
                     user_state.pop("awaiting_register", None)
+
             elif user_state.get("awaiting_login"):
                 parts = text.split()
                 if len(parts) != 2:
@@ -278,12 +311,14 @@ class TelegramBotHandler:
                 else:
                     await update.message.reply_text("❌ Неверный email или пароль.")
                 user_state.pop("awaiting_login", None)
+
             elif user_state.get("awaiting_inn"):
                 await self.process_inn_input(update, context)
             elif user_state.get("awaiting_token_amount"):
                 await self.process_token_amount(update, context)
             elif user_state.get("awaiting_purchase"):
                 await self.handle_purchase(update, context, user_id, text)
+
         except Exception as e:
             await update.message.reply_text(f"❌ Ошибка: {str(e)}")
 
@@ -300,12 +335,14 @@ class TelegramBotHandler:
         application.add_handler(CommandHandler("dividends", self.show_dividends))
         application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, self.handle_message))
 
+
 def run_bot():
     handler = TelegramBotHandler()
     application = ApplicationBuilder().token(TELEGRAM_BOT_TOKEN).build()
     handler.setup_handlers(application)
     logger.log("✅ Бот запущен")
     application.run_polling()
+
 
 if __name__ == "__main__":
     run_bot()
